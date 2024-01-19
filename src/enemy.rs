@@ -3,7 +3,7 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Enemy {
     speed: f32,
-    waypoint_id: usize,
+    pub waypoint_id: usize,
 }
 
 impl Enemy {
