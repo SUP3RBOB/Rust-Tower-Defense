@@ -1,22 +1,26 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Timer {
-    timer: f32,
+pub struct GameTimer {
+    time: f32,
 }
 
-impl Timer {
-    pub fn new(start_time: f32) -> Timer {
-        return Timer {
-            timer: 0.0,
+impl GameTimer {
+    pub fn new(start_time: f32) -> GameTimer {
+        return GameTimer {
+            time: start_time,
         }
     }
 
-    pub fn add_time(&mut self, delta: f32) {
-        self.timer += delta;
+    pub fn get_time(&self) -> f32 {
+        return self.time;
     }
 
-    pub fn reset_timer(&mut self) {
-        self.timer = 0.0;
+    pub fn add_time(&mut self, delta: f32) {
+        self.time += delta;
+    }
+
+    pub fn reset(&mut self) {
+        self.time = 0.0;
     }
 }
