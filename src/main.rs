@@ -1,6 +1,7 @@
 mod level;
 mod enemy;
 mod game;
+mod tower;
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -15,6 +16,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, game_init)
         .add_systems(Startup, create_points)
+        .add_systems(Update, tower::place_tower)
         .add_systems(Update, spawn_enemies)
         .add_systems(Update, move_enemy)
         .run();
