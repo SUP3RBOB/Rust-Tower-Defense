@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::ui::debug::print_ui_layout_tree;
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
