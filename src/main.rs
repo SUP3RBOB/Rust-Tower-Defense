@@ -2,12 +2,14 @@ mod level;
 mod enemy;
 mod game;
 mod tower;
+mod bullet;
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use enemy::Enemy;
 use level::Waypoints;
 use game::GameTimer;
+use bullet::Bullet;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
 
@@ -19,6 +21,7 @@ fn main() {
         .add_systems(Update, tower::place_tower)
         .add_systems(Update, spawn_enemies)
         .add_systems(Update, move_enemy)
+        .add_systems(Update, tower::update_tower)
         .run();
 }
 
@@ -80,7 +83,7 @@ fn spawn_enemies(
 fn move_enemy(
     mut commands: Commands,
     mut query: Query<(&mut Enemy, &mut Transform, Entity)>,
-    mut waypoints: Query<&Waypoints>,
+    waypoints: Query<&Waypoints>,
     time: Res<Time>,
 ) {
     for (mut enemy, mut transform, entity) in query.iter_mut() {

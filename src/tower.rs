@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::enemy::Enemy;
+
 #[derive(Component)]
 pub struct Tower {
     range: f32,
@@ -7,7 +9,7 @@ pub struct Tower {
 }
 
 impl Tower {
-    pub fn get_closest_in_range(&self, player_pos: Vec3, transforms: &Query<&Transform>) -> Vec3 {
+    pub fn get_closest_in_range(&self, player_pos: Vec3, transforms: &Query<&Transform, With<Enemy>>) -> Vec3 {
         let mut closest = player_pos;
 
         for transform in transforms.iter() {
@@ -24,6 +26,16 @@ impl Tower {
         }
 
         return closest;
+    }
+
+    pub fn rotate_towards(&self, transform: &mut Transform, point: Vec3) {
+        let difference = point - transform.translation;
+        let angle = f32::to_degrees(f32::atan2(difference.y, difference.x));
+        transform.rotation = Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, angle);
+    }
+
+    pub fn set_direction(&mut self, dir: Vec3) {
+        self.direction = dir;
     }
 }
 
@@ -49,5 +61,18 @@ pub fn place_tower(
                 ..default()
             });
         }
+    }
+}
+
+pub fn update_tower(
+    mut commands: Commands,
+    mut tower_query: Query<(&mut Tower, &mut Transform)>,
+    enemy_query: Query<&Transform, With<Enemy>>
+) {
+    for (mut tower, mut transform) in tower_query.iter_mut() {
+        let closest = tower.get_closest_in_range(transform.translation, &enemy_query);
+        tower.set_direction(Vec3::normalize(closest - transform.translation));
+        tower.rotate_towards(&mut transform, closest);
+        
     }
 }

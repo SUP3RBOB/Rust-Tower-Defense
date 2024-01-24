@@ -24,3 +24,26 @@ impl GameTimer {
         self.time = 0.0;
     }
 }
+
+#[derive(Component)]
+pub struct Health {
+    health: i32,
+    max_health: i32,
+}
+
+impl Health {
+    pub fn new(max_hp: i32) -> Health {
+        return Health {
+            health: max_hp,
+            max_health: max_hp
+        }
+    }
+
+    pub fn add(&mut self, amount: i32) {
+        self.health += amount;
+    }
+
+    pub fn lose(&mut self, amount: i32) {
+        self.health -= amount;
+    }
+}
