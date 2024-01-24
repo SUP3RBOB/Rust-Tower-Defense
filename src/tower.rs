@@ -17,7 +17,7 @@ impl Tower {
         }
     }
 
-    pub fn get_closest_in_range(&self, player_pos: Vec3, points: &Vec<Vec3>, out_closest: &mut Vec3) -> bool {
+    pub fn closest_in_range(&self, player_pos: Vec3, points: &Vec<Vec3>, out_closest: &mut Vec3) -> bool {
         let mut closest = Vec3::ZERO;
 
         for point in points.iter() {
@@ -89,7 +89,7 @@ pub fn update_tower(
 
     for (mut tower, mut transform) in set.p0().iter_mut() {
         let mut closest = Vec3::ZERO;
-        let has_closest = tower.get_closest_in_range(transform.translation, &points, &mut closest);
+        let has_closest = tower.closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
         tower.set_direction(Vec3::normalize(closest - transform.translation));
 
