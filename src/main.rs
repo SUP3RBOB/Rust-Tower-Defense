@@ -9,6 +9,7 @@ use bevy::window::PrimaryWindow;
 use enemy::Enemy;
 use level::Waypoints;
 use game::GameTimer;
+use game::EnemySpawner;
 use bullet::Bullet;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
@@ -32,7 +33,7 @@ fn game_init(mut commands: Commands, window_query: Query<&Window, With<PrimaryWi
         ..default()
     });
 
-    commands.spawn(GameTimer::new(0.0));
+    commands.spawn((GameTimer::new(0.0), EnemySpawner));
 }
 
 fn create_points(mut commands: Commands) {
@@ -59,7 +60,7 @@ fn create_points(mut commands: Commands) {
 fn spawn_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut timer_query: Query<&mut GameTimer>,
+    mut timer_query: Query<&mut GameTimer, With<EnemySpawner>>,
     time: Res<Time>,
 ) {
     if let Ok(mut timer) = timer_query.get_single_mut() {
@@ -90,8 +91,8 @@ fn move_enemy(
         let dir = Vec3::normalize(waypoints.single().points[enemy.waypoint_id] - transform.translation);
         let dist = Vec3::distance(transform.translation, waypoints.single().points[enemy.waypoint_id]);
 
-        if (dist <= 1.0) {
-            if (enemy.waypoint_id < waypoints.single().points.len() - 1) {
+        if (dist <= 6f32) {
+            if (enemy.waypoint_id < waypoints.single().points.len() - 1 as usize) {
                 enemy.waypoint_id += 1;
             } else {
                 commands.entity(entity).despawn();

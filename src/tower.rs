@@ -2,18 +2,21 @@ use bevy::prelude::*;
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
+use crate::game::GameTimer;
 
 #[derive(Component)]
 pub struct Tower {
     range: f32,
     direction: Vec3,
+    rate_of_fire: f32,
 }
 
 impl Tower {
-    pub fn new(range_: f32) -> Tower {
+    pub fn new(range_: f32, rof: f32) -> Tower {
         return Tower {
             range: range_,
             direction: Vec3::ZERO,
+            rate_of_fire: rof,
         }
     }
 
@@ -69,7 +72,8 @@ pub fn place_tower(
                 visibility: Visibility::Visible,
                 ..default()
             },
-            Tower::new(300.0))
+            Tower::new(300.0, 1.0),
+            GameTimer::new(0.0))
             );
         }
     }
@@ -78,16 +82,17 @@ pub fn place_tower(
 pub fn update_tower(
     mut commands: Commands,
     mut set: ParamSet <(
-        Query<(&mut Tower, &mut Transform)>,
+        Query<(&mut Tower, &mut Transform, &mut GameTimer), With<Tower>>,
         Query<&Transform, With<Enemy>>,
-    )>
+    )>,
+    time: Res<Time>
 ) {
     let mut points: Vec<Vec3> = Vec::new();
     for transform in set.p1().iter() {
         points.push(transform.translation);
     }
 
-    for (mut tower, mut transform) in set.p0().iter_mut() {
+    for (mut tower, mut transform, mut timer) in set.p0().iter_mut() {
         let mut closest = Vec3::ZERO;
         let has_closest = tower.closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
@@ -95,6 +100,12 @@ pub fn update_tower(
 
         if (has_closest) {
             tower.rotate_towards(&mut transform, closest);
+        }
+
+        timer.add_time(time.delta_seconds());
+        if (timer.get_time() >= tower.rate_of_fire) {
+            println!("Bullet spawn!");
+            timer.reset();
         }
     }
 }

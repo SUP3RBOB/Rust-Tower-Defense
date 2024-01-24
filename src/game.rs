@@ -26,6 +26,9 @@ impl GameTimer {
 }
 
 #[derive(Component)]
+pub struct EnemySpawner;
+
+#[derive(Component)]
 pub struct Health {
     health: i32,
     max_health: i32,
