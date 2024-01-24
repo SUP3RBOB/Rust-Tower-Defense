@@ -17,19 +17,19 @@ impl Tower {
         }
     }
 
-    pub fn get_closest_in_range(&self, player_pos: Vec3, transforms: &Query<&Transform, Without<Tower>>, out_closest: &mut Vec3) -> bool {
+    pub fn get_closest_in_range(&self, player_pos: Vec3, points: &Vec<Vec3>, out_closest: &mut Vec3) -> bool {
         let mut closest = Vec3::ZERO;
 
-        for transform in transforms.iter() {
+        for point in points.iter() {
             let prev_dist = Vec3::distance(player_pos, closest);
-            let dist = Vec3::distance(player_pos, transform.translation);
+            let dist = Vec3::distance(player_pos, (*point));
 
             if (dist > self.range) {
                 continue;
             }
 
             if (prev_dist > dist) {
-                closest = transform.translation;
+                closest = (*point);
             }
         }
 
@@ -77,12 +77,19 @@ pub fn place_tower(
 
 pub fn update_tower(
     mut commands: Commands,
-    mut tower_query: Query<(&mut Tower, &mut Transform)>,
-    enemy_query: Query<&Transform, Without<Tower>>
+    mut set: ParamSet <(
+        Query<(&mut Tower, &mut Transform)>,
+        Query<&Transform, With<Enemy>>,
+    )>
 ) {
-    for (mut tower, mut transform) in tower_query.iter_mut() {
+    let mut points: Vec<Vec3> = Vec::new();
+    for transform in set.p1().iter() {
+        points.push(transform.translation);
+    }
+
+    for (mut tower, mut transform) in set.p0().iter_mut() {
         let mut closest = Vec3::ZERO;
-        let has_closest = tower.get_closest_in_range(transform.translation, &enemy_query, &mut closest);
+        let has_closest = tower.get_closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
         tower.set_direction(Vec3::normalize(closest - transform.translation));
 
