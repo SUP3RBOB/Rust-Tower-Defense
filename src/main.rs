@@ -24,6 +24,7 @@ fn main() {
         .add_systems(Update, move_enemy)
         .add_systems(Update, tower::update_tower)
         .add_systems(Update, bullet::update_bullets)
+        .add_systems(Update, enemy::bullet_collision)
         .run();
 }
 
@@ -69,7 +70,7 @@ fn spawn_enemies(
 
         if (timer.get_time() >= ENEMY_SPAWN_RATE) {
             commands.spawn((
-                Enemy::new(10.0),
+                Enemy::new(150.0),
                 SpriteBundle {
                     transform: Transform::from_xyz(220.0, -84.0, 0.0),
                     texture: asset_server.load("sprites/square.png"),
@@ -99,7 +100,7 @@ fn move_enemy(
                 commands.entity(entity).despawn();
             }
         } else {
-            transform.translation += dir * 150.0 * time.delta_seconds();
+            transform.translation += dir * enemy.speed * time.delta_seconds();
             enemy.direction = dir;
         }
 
