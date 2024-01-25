@@ -23,6 +23,7 @@ fn main() {
         .add_systems(Update, spawn_enemies)
         .add_systems(Update, move_enemy)
         .add_systems(Update, tower::update_tower)
+        .add_systems(Update, bullet::update_bullets)
         .run();
 }
 
@@ -91,14 +92,15 @@ fn move_enemy(
         let dir = Vec3::normalize(waypoints.single().points[enemy.waypoint_id] - transform.translation);
         let dist = Vec3::distance(transform.translation, waypoints.single().points[enemy.waypoint_id]);
 
-        if (dist <= 6f32) {
-            if (enemy.waypoint_id < waypoints.single().points.len() - 1 as usize) {
+        if (dist <= 6.0) {
+            if (enemy.waypoint_id < waypoints.single().points.len() - 1usize) {
                 enemy.waypoint_id += 1;
             } else {
                 commands.entity(entity).despawn();
             }
         } else {
             transform.translation += dir * 150.0 * time.delta_seconds();
+            enemy.direction = dir;
         }
 
         //println!("Enemy position: {}, {}, {} at waypoint {}", enemy.1.translation.x, enemy.1.translation.y, enemy.1.translation.z, enemy.0.waypoint_id);

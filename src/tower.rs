@@ -72,7 +72,7 @@ pub fn place_tower(
                 visibility: Visibility::Visible,
                 ..default()
             },
-            Tower::new(300.0, 1.0),
+            Tower::new(300.0, 0.8),
             GameTimer::new(0.0))
             );
         }
@@ -83,13 +83,14 @@ pub fn update_tower(
     mut commands: Commands,
     mut set: ParamSet <(
         Query<(&mut Tower, &mut Transform, &mut GameTimer), With<Tower>>,
-        Query<&Transform, With<Enemy>>,
+        Query<(&Transform, &Enemy)>,
     )>,
-    time: Res<Time>
+    time: Res<Time>,
+    asset_server: Res<AssetServer>
 ) {
     let mut points: Vec<Vec3> = Vec::new();
-    for transform in set.p1().iter() {
-        points.push(transform.translation);
+    for (transform, enemy) in set.p1().iter() {
+        points.push(transform.translation + (enemy.direction * 32.0));
     }
 
     for (mut tower, mut transform, mut timer) in set.p0().iter_mut() {
@@ -98,13 +99,27 @@ pub fn update_tower(
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
         tower.set_direction(Vec3::normalize(closest - transform.translation));
 
-        if (has_closest) {
-            tower.rotate_towards(&mut transform, closest);
+        if (!has_closest) {
+            return;
         }
+
+        tower.rotate_towards(&mut transform, closest);
 
         timer.add_time(time.delta_seconds());
         if (timer.get_time() >= tower.rate_of_fire) {
-            println!("Bullet spawn!");
+            let mut bullet = Transform::from_translation(transform.translation);
+            bullet.rotation = transform.rotation;
+
+            commands.spawn((
+                Bullet::new(1, tower.direction, 550.0, 2.0),
+                SpriteBundle {
+                    transform: bullet,
+                    texture: asset_server.load("sprites/bullet.png"),
+                    visibility: Visibility::Visible,
+                    ..default()
+                },
+                GameTimer::new(0.0)
+            ));
             timer.reset();
         }
     }
