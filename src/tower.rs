@@ -111,7 +111,7 @@ pub fn update_tower(
             bullet.rotation = transform.rotation;
 
             commands.spawn((
-                Bullet::new(1, tower.direction, 550.0, 2.0),
+                Bullet::new(10, tower.direction, 550.0, 2.0),
                 SpriteBundle {
                     transform: bullet,
                     texture: asset_server.load("sprites/bullet.png"),

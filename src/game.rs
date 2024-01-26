@@ -42,6 +42,10 @@ impl Health {
         }
     }
 
+    pub fn get_health(&self) -> i32 {
+        return self.health;
+    }
+
     pub fn add(&mut self, amount: i32) {
         self.health += amount;
     }

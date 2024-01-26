@@ -26,6 +26,10 @@ impl Bullet {
     pub fn get_lifetime(&self) -> f32 {
         return self.lifetime;
     }
+
+    pub fn get_damage(&self) -> i32 {
+        return self.damage;
+    }
 }
 
 pub fn update_bullets(
