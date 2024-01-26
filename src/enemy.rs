@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy::sprite::collide_aabb::{collide, Collision};
+use bevy::sprite::collide_aabb::collide;
 use crate::bullet::Bullet;
 use crate::game::Health;
 

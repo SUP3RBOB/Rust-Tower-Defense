@@ -13,7 +13,6 @@ use level::Waypoints;
 use level::EnemyPath;
 use game::GameTimer;
 use game::EnemySpawner;
-use bullet::Bullet;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
 
