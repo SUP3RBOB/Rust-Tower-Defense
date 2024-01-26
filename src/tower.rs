@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
 use crate::game::GameTimer;
+use crate::level::EnemyPath;
 
 #[derive(Component)]
 pub struct Tower {
@@ -54,6 +55,7 @@ impl Tower {
 pub fn place_tower(
     mut commands: Commands,
     windows: Query<&Window>,
+    path_query: Query<&Transform, With<EnemyPath>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<Input<MouseButton>>,
     asset_server: Res<AssetServer>,
@@ -64,6 +66,12 @@ pub fn place_tower(
 
         if let Some(world_position) = window.cursor_position()
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
+            
+            for path in path_query.iter() {
+                if (EnemyPath::point_in_path(world_position, path)) {
+                    return;
+                }
+            }
 
             let spawn_position = Vec3::new(world_position.x, world_position.y, 0.0);
             commands.spawn((SpriteBundle {
