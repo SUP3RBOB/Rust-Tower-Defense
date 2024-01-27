@@ -7,6 +7,8 @@ mod bullet;
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
 use bevy::window::PrimaryWindow;
+use bevy_egui::EguiInput;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use enemy::Enemy;
 use game::Health;
 use level::Waypoints;
@@ -19,6 +21,7 @@ const ENEMY_SPAWN_RATE: f32 = 3.0;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(EguiPlugin)
         .add_systems(Startup, game_init)
         .add_systems(Startup, create_points)
         .add_systems(Update, tower::place_tower)
@@ -27,7 +30,14 @@ fn main() {
         .add_systems(Update, tower::update_tower)
         .add_systems(Update, bullet::update_bullets)
         .add_systems(Update, enemy::bullet_collision)
+        .add_systems(Update, basic_ui)
         .run();
+}
+
+fn basic_ui(mut contexts: EguiContexts) {
+    egui::Window::new("Hello").show(contexts.ctx_mut(), |ui| {
+        ui.label("world");
+    });
 }
 
 fn game_init(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {

@@ -89,19 +89,17 @@ pub fn place_tower(
 
 pub fn update_tower(
     mut commands: Commands,
-    mut set: ParamSet <(
-        Query<(&mut Tower, &mut Transform, &mut GameTimer), With<Tower>>,
-        Query<(&Transform, &Enemy)>,
-    )>,
+    mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer)>,
+    enemy_query: Query<(&Transform, &Enemy), Without<Tower>>,
     time: Res<Time>,
     asset_server: Res<AssetServer>
 ) {
     let mut points: Vec<Vec3> = Vec::new();
-    for (transform, enemy) in set.p1().iter() {
+    for (transform, enemy) in enemy_query.iter() {
         points.push(transform.translation + (enemy.direction * 32.0));
     }
 
-    for (mut tower, mut transform, mut timer) in set.p0().iter_mut() {
+    for (mut tower, mut transform, mut timer) in tower_query.iter_mut() {
         let mut closest = Vec3::ZERO;
         let has_closest = tower.closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
