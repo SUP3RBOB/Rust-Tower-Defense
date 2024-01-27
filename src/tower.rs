@@ -27,23 +27,24 @@ impl Tower {
     }
 
     pub fn closest_in_range(&self, player_pos: Vec3, points: &Vec<Vec3>, out_closest: &mut Vec3) -> bool {
-        let mut closest = Vec3::new(-2000.0, -2000.0, 0.0);
+        let mut closest = Vec3::ZERO;
+        let mut min_distance = f32::INFINITY;
 
         for point in points.iter() {
-            let prev_dist = Vec3::distance(player_pos, closest);
             let dist = Vec3::distance(player_pos, (*point));
 
             if (dist > self.range) {
                 continue;
             }
 
-            if (prev_dist > dist) {
+            if (dist < min_distance) {
+                min_distance = dist;
                 closest = (*point);
             }
         }
 
         (*out_closest) = closest;
-        return (*out_closest) != Vec3::new(-2000.0, -2000.0, 0.0);
+        return min_distance != f32::INFINITY;
     }
 
     pub fn rotate_towards(&self, transform: &mut Transform, point: Vec3) {
@@ -115,12 +116,12 @@ pub fn update_tower(
             continue;
         }
         
-        let mut closest = Vec3::new(-2000.0, -2000.0, 0.0);
-        let has_closest = tower.closest_in_range(transform.translation, &points, &mut closest);
+        let mut closest = Vec3::ZERO;
+        let has_closest: bool = tower.closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
 
         if (!has_closest) {
-            return;
+            continue;
         }
 
         tower.set_direction(Vec3::normalize(closest - transform.translation));
