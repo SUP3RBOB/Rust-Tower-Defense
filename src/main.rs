@@ -7,10 +7,11 @@ mod bullet;
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
 use bevy::window::PrimaryWindow;
-use bevy_egui::EguiInput;
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use enemy::Enemy;
 use game::Health;
+use game::PlayerStats;
+use game::RoundInfo;
 use level::Waypoints;
 use level::EnemyPath;
 use game::GameTimer;
@@ -30,14 +31,8 @@ fn main() {
         .add_systems(Update, tower::update_tower)
         .add_systems(Update, bullet::update_bullets)
         .add_systems(Update, enemy::bullet_collision)
-        .add_systems(Update, basic_ui)
+        .add_systems(Update, game::game_ui)
         .run();
-}
-
-fn basic_ui(mut contexts: EguiContexts) {
-    egui::Window::new("Hello").show(contexts.ctx_mut(), |ui| {
-        ui.label("world");
-    });
 }
 
 fn game_init(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
@@ -48,6 +43,8 @@ fn game_init(mut commands: Commands, window_query: Query<&Window, With<PrimaryWi
     });
 
     commands.spawn((GameTimer::new(0.0), EnemySpawner));
+    commands.spawn(PlayerStats::new(100));
+    commands.spawn(RoundInfo::new());
 }
 
 fn create_points(
@@ -127,9 +124,16 @@ fn spawn_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut timer_query: Query<&mut GameTimer, With<EnemySpawner>>,
+    round_info_query: Query<&RoundInfo>,
     time: Res<Time>,
 ) {
     if let Ok(mut timer) = timer_query.get_single_mut() {
+        let round_info = round_info_query.get_single().unwrap();
+
+        if (round_info.round_completed()) {
+            return;
+        }
+
         timer.add_time(time.delta_seconds());
 
         if (timer.get_time() >= ENEMY_SPAWN_RATE) {

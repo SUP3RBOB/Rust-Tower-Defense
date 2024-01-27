@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use crate::tower::Tower;
 
 #[derive(Component)]
 pub struct GameTimer {
@@ -58,12 +60,14 @@ impl Health {
 #[derive(Component)]
 pub struct PlayerStats {
     coins: i32,
+    pub is_placing: bool
 }
 
 impl PlayerStats {
     pub fn new(amount: i32) -> PlayerStats {
         return PlayerStats {
             coins: amount,
+            is_placing: false
         };
     }
 
@@ -129,4 +133,47 @@ impl RoundInfo {
     pub fn set_round_auto_start(&mut self, start: bool) {
         self.auto_start_round = start;
     }
+}
+
+#[derive(Component)]
+pub struct RangeView;
+
+pub fn game_ui(
+    mut contexts: EguiContexts,
+    mut commands: Commands,
+    mut player_stats_query: Query<&mut PlayerStats>,
+    mut round_info_query: Query<&mut RoundInfo>,
+    asset_server: Res<AssetServer>
+) {
+    let mut player_info = player_stats_query.get_single_mut().unwrap();
+    let mut round_info = round_info_query.get_single_mut().unwrap();
+
+    if (player_info.is_placing) {
+        return;
+    }
+
+    egui::Window::new("Game").show(contexts.ctx_mut(), |ui| {
+        ui.label(format!("Round: {}", round_info.round));
+        ui.label(format!("Coins: {}", player_info.coins));
+
+        if (round_info.round_completed()) {
+            if (ui.button("New Round").clicked()) {
+                round_info.new_round();
+            }
+        }
+
+        if (ui.button("Place Tower").clicked() && player_info.get_coins() >= 50) {
+            player_info.is_placing = true;
+
+            commands.spawn((SpriteBundle {
+                transform: Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0)),
+                texture: asset_server.load("sprites/tower.png"),
+                visibility: Visibility::Visible,
+                ..default()
+            },
+            Tower::new(300.0, 0.8, 50),
+            GameTimer::new(0.0))
+            );
+        }
+    });
 }

@@ -4,25 +4,30 @@ use crate::enemy::Enemy;
 use crate::bullet::Bullet;
 use crate::game::GameTimer;
 use crate::level::EnemyPath;
+use crate::game::PlayerStats;
 
 #[derive(Component)]
 pub struct Tower {
+    activated: bool,
     range: f32,
     direction: Vec3,
     rate_of_fire: f32,
+    cost: i32,
 }
 
 impl Tower {
-    pub fn new(range_: f32, rof: f32) -> Tower {
+    pub fn new(range_: f32, rof: f32, price: i32) -> Tower {
         return Tower {
+            activated: false,
             range: range_,
             direction: Vec3::ZERO,
             rate_of_fire: rof,
+            cost: price,
         }
     }
 
     pub fn closest_in_range(&self, player_pos: Vec3, points: &Vec<Vec3>, out_closest: &mut Vec3) -> bool {
-        let mut closest = Vec3::ZERO;
+        let mut closest = Vec3::new(-200.0, -200.0, 0.0);
 
         for point in points.iter() {
             let prev_dist = Vec3::distance(player_pos, closest);
@@ -38,7 +43,7 @@ impl Tower {
         }
 
         (*out_closest) = closest;
-        return (*out_closest) != Vec3::ZERO;
+        return (*out_closest) != Vec3::new(-200.0, -200.0, 0.0);
     }
 
     pub fn rotate_towards(&self, transform: &mut Transform, point: Vec3) {
@@ -50,39 +55,45 @@ impl Tower {
     pub fn set_direction(&mut self, dir: Vec3) {
         self.direction = dir;
     }
+
+    pub fn acitvate(&mut self, activate: bool) {
+        self.activated = activate;
+    }
 }
 
 pub fn place_tower(
     mut commands: Commands,
     windows: Query<&Window>,
-    path_query: Query<&Transform, With<EnemyPath>>,
+    path_query: Query<(&Transform, &EnemyPath), Without<Tower>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<Input<MouseButton>>,
-    asset_server: Res<AssetServer>,
+    mut tower_query: Query<(Entity, &mut Tower, &mut Transform)>,
+    mut player_stats_query: Query<&mut PlayerStats>,
 ) {
-    if (mouse.just_pressed(MouseButton::Left)) {
-        let window = windows.single();
-        let (camera, camera_transform) = camera_query.single();
+    let window = windows.single();
+    let (camera, camera_transform) = camera_query.single();
+    let mut player_stats = player_stats_query.get_single_mut().unwrap();
+
+    for (entity, mut tower, mut transform) in tower_query.iter_mut() {
+        if (tower.activated) {
+            continue;
+        }
 
         if let Some(world_position) = window.cursor_position()
-            .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
-            
-            for path in path_query.iter() {
-                if (EnemyPath::point_in_path(world_position, path)) {
-                    return;
-                }
-            }
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
+        
+            transform.translation = Vec3::new(world_position.x, world_position.y, 3.0);
+        }
 
-            let spawn_position = Vec3::new(world_position.x, world_position.y, 0.0);
-            commands.spawn((SpriteBundle {
-                transform: Transform::from_translation(spawn_position),
-                texture: asset_server.load("sprites/tower.png"),
-                visibility: Visibility::Visible,
-                ..default()
-            },
-            Tower::new(300.0, 0.8),
-            GameTimer::new(0.0))
-            );
+        if (mouse.pressed(MouseButton::Left)) {
+            tower.acitvate(true);
+            player_stats.is_placing = false;
+            player_stats.lose_coins(tower.cost);
+        }
+
+        if (mouse.pressed(MouseButton::Right)) {
+            commands.entity(entity).despawn();
+            player_stats.is_placing = false;
         }
     }
 }
@@ -100,15 +111,19 @@ pub fn update_tower(
     }
 
     for (mut tower, mut transform, mut timer) in tower_query.iter_mut() {
-        let mut closest = Vec3::ZERO;
+        if (!tower.activated) {
+            continue;
+        }
+        
+        let mut closest = Vec3::new(-200.0, -200.0, 0.0);
         let has_closest = tower.closest_in_range(transform.translation, &points, &mut closest);
         //println!("{}, {}, {}", closest.x, closest.y, closest.z);
-        tower.set_direction(Vec3::normalize(closest - transform.translation));
 
         if (!has_closest) {
             return;
         }
 
+        tower.set_direction(Vec3::normalize(closest - transform.translation));
         tower.rotate_towards(&mut transform, closest);
 
         timer.add_time(time.delta_seconds());
