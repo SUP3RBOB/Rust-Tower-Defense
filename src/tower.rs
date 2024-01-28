@@ -2,13 +2,13 @@ use bevy::prelude::*;
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
-use crate::game::GameTimer;
+use crate::game::{GameTimer, RangeView};
 use crate::level::EnemyPath;
 use crate::game::PlayerStats;
 
 #[derive(Component)]
 pub struct Tower {
-    activated: bool,
+    pub activated: bool,
     range: f32,
     direction: Vec3,
     rate_of_fire: f32,
@@ -60,6 +60,10 @@ impl Tower {
     pub fn acitvate(&mut self, activate: bool) {
         self.activated = activate;
     }
+
+    pub fn get_range(&self) -> f32 {
+        return self.range;
+    }
 }
 
 pub fn place_tower(
@@ -70,10 +74,12 @@ pub fn place_tower(
     mouse: Res<Input<MouseButton>>,
     mut tower_query: Query<(Entity, &mut Tower, &mut Transform)>,
     mut player_stats_query: Query<&mut PlayerStats>,
+    mut range_view_query: Query<&mut Visibility, With<RangeView>>,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
     let mut player_stats = player_stats_query.get_single_mut().unwrap();
+    let mut range_visibility = range_view_query.get_single_mut().unwrap();
 
     for (entity, mut tower, mut transform) in tower_query.iter_mut() {
         if (tower.activated) {
@@ -90,11 +96,13 @@ pub fn place_tower(
             tower.acitvate(true);
             player_stats.is_placing = false;
             player_stats.lose_coins(tower.cost);
+            (*range_visibility) = Visibility::Hidden;
         }
 
         if (mouse.pressed(MouseButton::Right)) {
             commands.entity(entity).despawn();
             player_stats.is_placing = false;
+            (*range_visibility) = Visibility::Hidden;
         }
     }
 }

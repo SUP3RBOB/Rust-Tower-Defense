@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use std::collections::btree_map::Range;
+
+use bevy::{prelude::*, transform};
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use crate::tower::Tower;
 
@@ -138,15 +140,34 @@ impl RoundInfo {
 #[derive(Component)]
 pub struct RangeView;
 
+pub fn place_tower_range_view(
+    mut range_view_query: Query<(&mut Transform, &RangeView), Without<Tower>>,
+    tower_query: Query<(&Transform, &Tower), Without<RangeView>>,
+) {
+    let (mut r_transform, view) = range_view_query.get_single_mut().unwrap();
+
+    for (transform, tower) in tower_query.iter() {
+        if (tower.activated) {
+            continue;
+        }
+
+        r_transform.translation = transform.translation;
+        r_transform.translation.z = -0.5;
+        r_transform.scale = Vec3::new(tower.get_range() / 32.0, tower.get_range() / 32.0, 1.0);
+    }
+}
+
 pub fn game_ui(
     mut contexts: EguiContexts,
     mut commands: Commands,
     mut player_stats_query: Query<&mut PlayerStats>,
     mut round_info_query: Query<&mut RoundInfo>,
+    mut range_view_query: Query<(&mut Transform, &mut Visibility), With<RangeView>>,
     asset_server: Res<AssetServer>
 ) {
     let mut player_info = player_stats_query.get_single_mut().unwrap();
     let mut round_info = round_info_query.get_single_mut().unwrap();
+    let (mut r_transform, mut r_visible) = range_view_query.get_single_mut().unwrap();
 
     if (player_info.is_placing) {
         return;
@@ -174,6 +195,9 @@ pub fn game_ui(
             Tower::new(300.0, 0.8, 50),
             GameTimer::new(0.0))
             );
+
+            r_transform.scale = Vec3::new(300.0 / 32.0, 300.0 / 32.0, 1.0);
+            (*r_visible) = Visibility::Visible;
         }
     });
 }

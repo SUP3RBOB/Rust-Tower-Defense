@@ -16,16 +16,18 @@ use level::Waypoints;
 use level::EnemyPath;
 use game::GameTimer;
 use game::EnemySpawner;
+use game::RangeView;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(EguiPlugin)
         .add_systems(Startup, game_init)
         .add_systems(Startup, create_points)
         .add_systems(Update, tower::place_tower)
+        .add_systems(Update, game::place_tower_range_view)
         .add_systems(Update, spawn_enemies)
         .add_systems(Update, move_enemy)
         .add_systems(Update, tower::update_tower)
@@ -35,16 +37,29 @@ fn main() {
         .run();
 }
 
-fn game_init(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+fn game_init(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
     let window = window_query.get_single().unwrap();
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, -1.0),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, -50.0),
         ..default()
     });
 
     commands.spawn((GameTimer::new(0.0), EnemySpawner));
     commands.spawn(PlayerStats::new(100));
     commands.spawn(RoundInfo::new());
+    commands.spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(64.0, 64.0, -0.5),
+            texture: asset_server.load("sprites/range_view.png"),
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        RangeView
+    ));
 }
 
 fn create_points(
@@ -69,18 +84,18 @@ fn create_points(
     ps.push(Vec3::new(1380.0, 600.0, 0.0));
 
     let mut paths: Vec<Vec3> = Vec::new();
-    paths.push(Vec3::new(2.4, 9.6, 1.0));
-    paths.push(Vec3::new(8.0, 2.4, 1.0));
-    paths.push(Vec3::new(2.4, 8.4, 1.0));
-    paths.push(Vec3::new(8.0, 2.4, 1.0));
-    paths.push(Vec3::new(2.4, 8.3, 1.0));
-    paths.push(Vec3::new(14.3, 2.4, 1.0));
-    paths.push(Vec3::new(2.4, 8.3, 1.0));
-    paths.push(Vec3::new(16.5, 2.4, 1.0));
-    paths.push(Vec3::new(2.4, 8.5, 1.0));
-    paths.push(Vec3::new(10.2, 2.4, 1.0));
-    paths.push(Vec3::new(2.4, 18.05, 1.0));
-    paths.push(Vec3::new(16.5, 2.4, 1.0));
+    paths.push(Vec3::new(2.4, 9.6, -1.0));
+    paths.push(Vec3::new(8.0, 2.4, -1.0));
+    paths.push(Vec3::new(2.4, 8.4, -1.0));
+    paths.push(Vec3::new(8.0, 2.4, -1.0));
+    paths.push(Vec3::new(2.4, 8.3, -1.0));
+    paths.push(Vec3::new(14.3, 2.4, -1.0));
+    paths.push(Vec3::new(2.4, 8.3, -1.0));
+    paths.push(Vec3::new(16.5, 2.4, -1.0));
+    paths.push(Vec3::new(2.4, 8.5, -1.0));
+    paths.push(Vec3::new(10.2, 2.4, -1.0));
+    paths.push(Vec3::new(2.4, 18.05, -1.0));
+    paths.push(Vec3::new(16.5, 2.4, -1.0));
 
     let mut i = 0;
     while (i < ps.len() - 1) {
