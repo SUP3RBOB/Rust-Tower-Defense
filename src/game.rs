@@ -153,7 +153,7 @@ pub fn place_tower_range_view(
 
         r_transform.translation = transform.translation;
         r_transform.translation.z = -0.5;
-        r_transform.scale = Vec3::new(tower.get_range() / 32.0, tower.get_range() / 32.0, 1.0);
+        r_transform.scale = Vec3::new(tower.get_range() * 2.0 / 32.0, tower.get_range() * 2.0 / 32.0, 1.0);
     }
 }
 
@@ -192,11 +192,10 @@ pub fn game_ui(
                 visibility: Visibility::Visible,
                 ..default()
             },
-            Tower::new(300.0, 0.8, 50),
+            Tower::new(150.0, 0.8, 50),
             GameTimer::new(0.0))
             );
 
-            r_transform.scale = Vec3::new(300.0 / 32.0, 300.0 / 32.0, 1.0);
             (*r_visible) = Visibility::Visible;
         }
     });
