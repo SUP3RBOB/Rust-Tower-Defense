@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 use crate::bullet::Bullet;
-use crate::game::{Health, PlayerStats};
+use crate::game::{Health, PlayerStats, RoundInfo};
 
 #[derive(Component)]
 pub struct Enemy {
@@ -25,8 +25,10 @@ pub fn bullet_collision(
     mut enemy_query: Query<(Entity, &Transform, &mut Health), With<Enemy>>,
     bullet_query: Query<(Entity, &Transform, &Bullet)>,
     mut player_stats_query: Query<&mut PlayerStats>,
+    mut round_info_query: Query<&mut RoundInfo>,
 ) {
     let mut player_stats = player_stats_query.get_single_mut().unwrap();
+    let mut round_info = round_info_query.get_single_mut().unwrap();
 
     let e_size = Vec2::new(32.0, 32.0);
     let b_size = Vec2::new(24.0, 4.0);
@@ -41,6 +43,7 @@ pub fn bullet_collision(
                 health.lose(bullet.get_damage());
                 if (health.get_health() <= 0) {
                     commands.entity(e_entity).despawn();
+                    round_info.enemies_killed += 1;
                     player_stats.add_coins(10);
                     continue;
                 }

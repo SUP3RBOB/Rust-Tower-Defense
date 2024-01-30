@@ -139,11 +139,11 @@ fn spawn_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut timer_query: Query<&mut GameTimer, With<EnemySpawner>>,
-    round_info_query: Query<&RoundInfo>,
+    mut round_info_query: Query<&mut RoundInfo>,
     time: Res<Time>,
 ) {
     if let Ok(mut timer) = timer_query.get_single_mut() {
-        let round_info = round_info_query.get_single().unwrap();
+        let mut round_info = round_info_query.get_single_mut().unwrap();
 
         if (round_info.round_completed()) {
             return;
@@ -162,6 +162,8 @@ fn spawn_enemies(
                 },
                 Health::new(30),
             ));
+            
+            round_info.enemies_spawned += 1;
             timer.reset();
         }
     }

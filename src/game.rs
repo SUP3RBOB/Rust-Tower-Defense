@@ -96,8 +96,8 @@ pub struct RoundInfo {
     round: i32,
     round_completed: bool,
     max_enemies: i32,
-    enemies_spawned: i32,
-    enemies_killed: i32,
+    pub enemies_spawned: i32,
+    pub enemies_killed: i32,
     total_enemies: i32,
     auto_start_round: bool,
 }
