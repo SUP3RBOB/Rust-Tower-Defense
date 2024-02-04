@@ -98,7 +98,7 @@ pub struct RoundInfo {
     max_enemies: i32,
     pub enemies_spawned: i32,
     pub enemies_killed: i32,
-    total_enemies: i32,
+    pub total_enemies: i32,
     auto_start_round: bool,
 }
 
@@ -192,11 +192,22 @@ pub fn game_ui(
                 visibility: Visibility::Visible,
                 ..default()
             },
-            Tower::new(150.0, 0.8, 50),
-            GameTimer::new(0.0))
+                Tower::new(150.0, 0.8, 50),
+                GameTimer::new(0.0))
             );
 
             (*r_visible) = Visibility::Visible;
         }
     });
+}
+
+pub fn end_round(
+    mut round_info_query: Query<&mut RoundInfo>
+) {
+    let mut round_info = round_info_query.get_single_mut().unwrap();
+    if (round_info.enemies_spawned == round_info.enemies_killed 
+        && round_info.enemies_killed >= round_info.total_enemies
+        && !round_info.round_completed()) {
+        round_info.round_completed = true;
+    }
 }

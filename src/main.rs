@@ -33,6 +33,7 @@ fn main() {
         .add_systems(Update, tower::update_tower)
         .add_systems(Update, bullet::update_bullets)
         .add_systems(Update, enemy::bullet_collision)
+        .add_systems(Update, game::end_round)
         .add_systems(Update, game::game_ui)
         .run();
 }
@@ -145,7 +146,8 @@ fn spawn_enemies(
     if let Ok(mut timer) = timer_query.get_single_mut() {
         let mut round_info = round_info_query.get_single_mut().unwrap();
 
-        if (round_info.round_completed()) {
+        if (round_info.enemies_spawned >= round_info.total_enemies || round_info.round_completed()) {
+            timer.reset();
             return;
         }
 
