@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_egui::egui::epaint::tessellator::path;
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
@@ -90,19 +91,31 @@ pub fn place_tower(
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
         
             transform.translation = Vec3::new(world_position.x, world_position.y, 3.0);
-        }
+            
+            let mut in_path = false;
+            for (path_trans, enemy_path) in path_query.iter() {
+                in_path = EnemyPath::point_in_path(world_position, path_trans);
+                if (in_path) {
+                    break;
+                }
+            }
 
-        if (mouse.pressed(MouseButton::Left)) {
-            tower.acitvate(true);
-            player_stats.is_placing = false;
-            player_stats.lose_coins(tower.cost);
-            (*range_visibility) = Visibility::Hidden;
-        }
+            if (mouse.pressed(MouseButton::Left)) {
+                if (in_path) {
+                    return;
+                }
 
-        if (mouse.pressed(MouseButton::Right)) {
-            commands.entity(entity).despawn();
-            player_stats.is_placing = false;
-            (*range_visibility) = Visibility::Hidden;
+                tower.acitvate(true);
+                player_stats.is_placing = false;
+                player_stats.lose_coins(tower.cost);
+                (*range_visibility) = Visibility::Hidden;
+            }
+    
+            if (mouse.pressed(MouseButton::Right)) {
+                commands.entity(entity).despawn();
+                player_stats.is_placing = false;
+                (*range_visibility) = Visibility::Hidden;
+            }
         }
     }
 }

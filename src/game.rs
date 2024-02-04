@@ -1,6 +1,4 @@
-use std::collections::btree_map::Range;
-
-use bevy::{prelude::*, transform};
+use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use crate::tower::Tower;
 
