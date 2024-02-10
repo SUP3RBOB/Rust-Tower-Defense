@@ -119,7 +119,7 @@ pub fn place_tower(
                 }
             }
 
-            if (mouse.pressed(MouseButton::Left)) {
+            if (mouse.just_released(MouseButton::Left)) {
                 if (in_path) {
                     return;
                 }
@@ -197,26 +197,33 @@ pub fn upgrade_tower(
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
 
-    if (mouse.pressed(MouseButton::Left)) {
+    if (mouse.just_released(MouseButton::Left)) {
+        if (contexts.ctx_mut().is_pointer_over_area()) {
+            return;
+        }
+
         if let Some(world_position) = window.cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
-            for (mut tower, transform) in tower_query.iter_mut() {
-                tower.selected = false;
-            }
 
             for (mut tower, transform) in tower_query.iter_mut() {
                 if (tower.clicked(world_position, &transform)) {
                     tower.selected = true;
-                    return;
+                    break;
                 }
+
+                tower.selected = false;
             }
         }
     }
 
     for (tower, transform) in tower_query.iter() {
         if (tower.selected) {
-            egui::Window::new("Tower").default_pos(Pos2::new(500.0, 500.0)).show(contexts.ctx_mut(), |ui| {
-                
+            egui::Window::new("Tower").default_pos(Pos2::new(1280.0, 720.0)).show(contexts.ctx_mut(), |ui| {
+                ui.label("Level: 1");
+                ui.label("Rate of Fire: ");
+                if (ui.button("Upgrade Tower (20 Coins)").clicked()) {
+
+                }
             });
             return;
         }
