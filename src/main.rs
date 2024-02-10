@@ -30,6 +30,7 @@ fn main() {
         .add_systems(Update, game::place_tower_range_view)
         .add_systems(Update, spawn_enemies)
         .add_systems(Update, move_enemy)
+        .add_systems(Update, tower::upgrade_tower)
         .add_systems(Update, tower::update_tower)
         .add_systems(Update, bullet::update_bullets)
         .add_systems(Update, enemy::bullet_collision)

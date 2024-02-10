@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use bevy_egui::egui::epaint::tessellator::path;
+use bevy_egui::egui::Pos2;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
@@ -14,6 +15,7 @@ pub struct Tower {
     direction: Vec3,
     rate_of_fire: f32,
     cost: i32,
+    selected: bool,
 }
 
 impl Tower {
@@ -24,6 +26,7 @@ impl Tower {
             direction: Vec3::ZERO,
             rate_of_fire: rof,
             cost: price,
+            selected: false
         }
     }
 
@@ -64,6 +67,22 @@ impl Tower {
 
     pub fn get_range(&self) -> f32 {
         return self.range;
+    }
+
+    pub fn clicked(&self, point: Vec2, transform: &Transform) -> bool {
+        let width = 32.0 * transform.scale.x;
+        let height = 32.0 * transform.scale.y;
+        
+        let top = transform.translation.y + height / 2.0;
+        let bottom = transform.translation.y - height / 2.0;
+        let right = transform.translation.x + width / 2.0;
+        let left = transform.translation.x - width / 2.0;
+        
+        if (point.x >= left && point.x <= right && point.y <= top && point.y >= bottom) {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -164,6 +183,42 @@ pub fn update_tower(
                 GameTimer::new(0.0)
             ));
             timer.reset();
+        }
+    }
+}
+
+pub fn upgrade_tower(
+    mut tower_query: Query<(&mut Tower, &Transform)>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    mouse: Res<Input<MouseButton>>,
+    windows: Query<&Window>,
+    mut contexts: EguiContexts,
+) {
+    let window = windows.single();
+    let (camera, camera_transform) = camera_query.single();
+
+    if (mouse.pressed(MouseButton::Left)) {
+        if let Some(world_position) = window.cursor_position()
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
+            for (mut tower, transform) in tower_query.iter_mut() {
+                tower.selected = false;
+            }
+
+            for (mut tower, transform) in tower_query.iter_mut() {
+                if (tower.clicked(world_position, &transform)) {
+                    tower.selected = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    for (tower, transform) in tower_query.iter() {
+        if (tower.selected) {
+            egui::Window::new("Tower").default_pos(Pos2::new(500.0, 500.0)).show(contexts.ctx_mut(), |ui| {
+                
+            });
+            return;
         }
     }
 }
