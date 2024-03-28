@@ -32,6 +32,13 @@ impl Bullet {
     }
 }
 
+pub struct BulletPlugin;
+impl Plugin for BulletPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, update_bullets);
+    }
+}
+
 pub fn update_bullets(
     mut commands: Commands,
     mut bullet_query: Query<(&mut Bullet, &mut Transform, &mut GameTimer, Entity)>,

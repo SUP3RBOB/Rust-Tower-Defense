@@ -1,6 +1,17 @@
 use bevy::prelude::*;
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use bevy::window::PrimaryWindow;
+use bevy_egui::{egui, EguiContexts};
 use crate::tower::Tower;
+
+pub struct GamePlugin;
+impl Plugin for GamePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, game_init);
+        app.add_systems(Update, place_tower_range_view);
+        app.add_systems(Update, game_ui);
+        app.add_systems(Update, end_round);
+    }
+}
 
 #[derive(Component)]
 pub struct GameTimer {
@@ -138,7 +149,32 @@ impl RoundInfo {
 #[derive(Component)]
 pub struct RangeView;
 
-pub fn place_tower_range_view(
+fn game_init(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    let window = window_query.get_single().unwrap();
+    commands.spawn(Camera2dBundle {
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, -50.0),
+        ..default()
+    });
+
+    commands.spawn((GameTimer::new(0.0), EnemySpawner));
+    commands.spawn(PlayerStats::new(100));
+    commands.spawn(RoundInfo::new());
+    commands.spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(64.0, 64.0, -0.5),
+            texture: asset_server.load("sprites/range_view.png"),
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        RangeView
+    ));
+}
+
+fn place_tower_range_view(
     mut range_view_query: Query<(&mut Transform, &RangeView), Without<Tower>>,
     tower_query: Query<(&Transform, &Tower), Without<RangeView>>,
 ) {
@@ -155,7 +191,7 @@ pub fn place_tower_range_view(
     }
 }
 
-pub fn game_ui(
+fn game_ui(
     mut contexts: EguiContexts,
     mut commands: Commands,
     mut player_stats_query: Query<&mut PlayerStats>,
@@ -199,7 +235,7 @@ pub fn game_ui(
     });
 }
 
-pub fn end_round(
+fn end_round(
     mut round_info_query: Query<&mut RoundInfo>
 ) {
     let mut round_info = round_info_query.get_single_mut().unwrap();

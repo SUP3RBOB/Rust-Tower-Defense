@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 use crate::bullet::Bullet;
 use crate::game::{Health, PlayerStats, RoundInfo};
+use crate::level::Waypoints;
 
 #[derive(Component)]
 pub struct Enemy {
@@ -20,7 +21,40 @@ impl Enemy {
     }
 }
 
-pub fn bullet_collision(
+pub struct EnemyPlugin;
+impl Plugin for EnemyPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, move_enemy);
+        app.add_systems(Update, bullet_collision);
+    }
+}
+
+fn move_enemy(
+    mut commands: Commands,
+    mut query: Query<(&mut Enemy, &mut Transform, Entity)>,
+    waypoints: Query<&Waypoints>,
+    time: Res<Time>,
+) {
+    for (mut enemy, mut transform, entity) in query.iter_mut() {
+        let dir = Vec3::normalize(waypoints.single().points[enemy.waypoint_id] - transform.translation);
+        let dist = Vec3::distance(transform.translation, waypoints.single().points[enemy.waypoint_id]);
+
+        if (dist <= 6.0) {
+            if (enemy.waypoint_id < waypoints.single().points.len() - 1usize) {
+                enemy.waypoint_id += 1;
+            } else {
+                commands.entity(entity).despawn();
+            }
+        } else {
+            transform.translation += dir * enemy.speed * time.delta_seconds();
+            enemy.direction = dir;
+        }
+
+        //println!("Enemy position: {}, {}, {} at waypoint {}", enemy.1.translation.x, enemy.1.translation.y, enemy.1.translation.z, enemy.0.waypoint_id);
+    }
+}
+
+fn bullet_collision(
     mut commands: Commands,
     mut enemy_query: Query<(Entity, &Transform, &mut Health), With<Enemy>>,
     bullet_query: Query<(Entity, &Transform, &Bullet)>,

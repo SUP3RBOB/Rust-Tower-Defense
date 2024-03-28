@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3c7b3178-c603-4912-a570-d5e7fa72dff2" name="Changes" comment="Renamed tower function">
+      <change beforePath="$PROJECT_DIR$/src/bullet.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/bullet.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tower.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/tower.rs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SUP3RBOB&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="cd6b3220-74e9-4d44-a710-34465ecd5a16" />
+        <option name="url" value="https://github.com/SUP3RBOB/Rust-Tower-Defense.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="vx3qc23q" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2b9IVA84SxzCErztKWN2HJWkyoL" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.Run.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;F:/Projects/RustRover/Rust_Tower_Defense&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.first.attach.projects.stats&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Rust&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\Projects\RustRover\Rust_Tower_Defense\assets\sprites" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\Projects\RustRover\Rust_Tower_Defense\assets" />
+      <recent name="F:\Projects\RustRover\Rust_Tower_Defense\src\sprites" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run --package Rust_Tower_Defense --bin Rust_Tower_Defense" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3c7b3178-c603-4912-a570-d5e7fa72dff2" name="Changes" comment="" />
+      <created>1705176172317</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1705176172317</updated>
+      <workItem from="1705176176675" duration="191000" />
+      <workItem from="1705620890257" duration="2477000" />
+      <workItem from="1705626409578" duration="1711000" />
+      <workItem from="1705630903506" duration="2072000" />
+      <workItem from="1705633325627" duration="21000" />
+      <workItem from="1705634293339" duration="478000" />
+      <workItem from="1705700504453" duration="6161000" />
+      <workItem from="1705709960372" duration="873000" />
+      <workItem from="1706033107374" duration="3531000" />
+      <workItem from="1706040296273" duration="5395000" />
+      <workItem from="1706060303299" duration="3084000" />
+      <workItem from="1706063413651" duration="77000" />
+      <workItem from="1706114577347" duration="1073000" />
+      <workItem from="1706128835658" duration="833000" />
+      <workItem from="1711298111528" duration="18000" />
+      <workItem from="1711381636217" duration="1292000" />
+      <workItem from="1711489939629" duration="1196000" />
+      <workItem from="1711499481958" duration="10000" />
+      <workItem from="1711499505846" duration="15000" />
+      <workItem from="1711499889192" duration="1563000" />
+      <workItem from="1711666770395" duration="21000" />
+    </task>
+    <task id="LOCAL-00001" summary="Initial Commit&#10;- Code is a little messy, just testing what bevy can do">
+      <option name="closed" value="true" />
+      <created>1705634390310</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1705634390310</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Initial Commit&#10;- Code is a little messy, just testing what bevy can do">
+      <option name="closed" value="true" />
+      <created>1705634478739</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1705634478739</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Initial Commit&#10;- Code is a little messy, just testing what bevy can do">
+      <option name="closed" value="true" />
+      <created>1705634610462</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1705634610462</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Enemy moves towards points&#10;- Added basic square sprite&#10;- Enemy moves towards a list of points and despawns when it hits the end">
+      <option name="closed" value="true" />
+      <created>1705707153884</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1705707153884</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Enemies spawn every three seconds&#10;- Made a basic map layout with waypoints for the enemies">
+      <option name="closed" value="true" />
+      <created>1706036883312</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1706036883312</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Started developing a tower component">
+      <option name="closed" value="true" />
+      <created>1706050897741</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1706050897741</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Towers can now rotate towards enemies">
+      <option name="closed" value="true" />
+      <created>1706063470972</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1706063470972</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Small adjustment to the tower">
+      <option name="closed" value="true" />
+      <created>1706129237788</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1706129237788</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Renamed tower function">
+      <option name="closed" value="true" />
+      <created>1706129422496</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1706129422497</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial Commit&#10;- Code is a little messy, just testing what bevy can do" />
+    <MESSAGE value="Enemy moves towards points&#10;- Added basic square sprite&#10;- Enemy moves towards a list of points and despawns when it hits the end" />
+    <MESSAGE value="Enemies spawn every three seconds&#10;- Made a basic map layout with waypoints for the enemies" />
+    <MESSAGE value="Started developing a tower component" />
+    <MESSAGE value="Towers can now rotate towards enemies" />
+    <MESSAGE value="Small adjustment to the tower" />
+    <MESSAGE value="Renamed tower function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed tower function" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

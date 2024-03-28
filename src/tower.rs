@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_egui::egui::Pos2;
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use bevy_egui::{egui, EguiContexts};
 
 use crate::enemy::Enemy;
 use crate::bullet::Bullet;
@@ -69,6 +69,10 @@ impl Tower {
         return self.range;
     }
 
+    pub fn is_selected(&self) -> bool {
+        return self.selected;
+    }
+
     pub fn clicked(&self, point: Vec2, transform: &Transform) -> bool {
         let width = 32.0 * transform.scale.x;
         let height = 32.0 * transform.scale.y;
@@ -86,7 +90,16 @@ impl Tower {
     }
 }
 
-pub fn place_tower(
+pub struct TowerPlugin;
+impl Plugin for TowerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, place_tower);
+        app.add_systems(Update, update_tower);
+        app.add_systems(Update, upgrade_tower);
+    }
+}
+
+fn place_tower(
     mut commands: Commands,
     windows: Query<&Window>,
     path_query: Query<(&Transform, &EnemyPath), Without<Tower>>,
@@ -139,7 +152,7 @@ pub fn place_tower(
     }
 }
 
-pub fn update_tower(
+fn update_tower(
     mut commands: Commands,
     mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer)>,
     enemy_query: Query<(&Transform, &Enemy), Without<Tower>>,
@@ -187,7 +200,7 @@ pub fn update_tower(
     }
 }
 
-pub fn upgrade_tower(
+fn upgrade_tower(
     mut tower_query: Query<(&mut Tower, &Transform)>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<Input<MouseButton>>,
