@@ -1,7 +1,8 @@
-use bevy::prelude::*;
+use bevy::sprite::{MaterialMesh2dBundle, Mesh2d, Mesh2dHandle};
+use bevy::{prelude::*, render::view::visibility};
 use bevy::window::PrimaryWindow;
 use bevy_egui::{egui, EguiContexts};
-use crate::tower::Tower;
+use crate::tower::{self, Tower};
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
@@ -153,6 +154,8 @@ fn game_init(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let window = window_query.get_single().unwrap();
     commands.spawn(Camera2dBundle {
@@ -175,19 +178,19 @@ fn game_init(
 }
 
 fn place_tower_range_view(
-    mut range_view_query: Query<(&mut Transform, &RangeView), Without<Tower>>,
+    mut range_view_query: Query<(&mut Transform, &RangeView, &mut Visibility), Without<Tower>>,
     tower_query: Query<(&Transform, &Tower), Without<RangeView>>,
 ) {
-    let (mut r_transform, view) = range_view_query.get_single_mut().unwrap();
+    let (mut r_transform, view, mut visibility) = range_view_query.get_single_mut().unwrap();
 
     for (transform, tower) in tower_query.iter() {
-        if (tower.activated) {
-            continue;
+        if ((!tower.activated && !tower.is_selected()) || (tower.activated && tower.is_selected())) {
+            r_transform.translation = transform.translation;
+            r_transform.translation.z = -0.5;
+            r_transform.scale = Vec3::new(tower.get_range() * 2.0 / 32.0, tower.get_range() * 2.0 / 32.0, 1.0);
+            (*visibility) = Visibility::Visible;
+            break;
         }
-
-        r_transform.translation = transform.translation;
-        r_transform.translation.z = -0.5;
-        r_transform.scale = Vec3::new(tower.get_range() * 2.0 / 32.0, tower.get_range() * 2.0 / 32.0, 1.0);
     }
 }
 
@@ -197,6 +200,7 @@ fn game_ui(
     mut player_stats_query: Query<&mut PlayerStats>,
     mut round_info_query: Query<&mut RoundInfo>,
     mut range_view_query: Query<(&mut Transform, &mut Visibility), With<RangeView>>,
+    mut tower_query: Query<&mut Tower>,
     asset_server: Res<AssetServer>
 ) {
     let mut player_info = player_stats_query.get_single_mut().unwrap();
@@ -218,11 +222,18 @@ fn game_ui(
         }
 
         if (ui.button("Place Tower").clicked() && player_info.get_coins() >= 50) {
+            for mut tower in tower_query.iter_mut() {
+                tower.set_selected(false);
+            }
+
             player_info.is_placing = true;
 
+            let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
+            t.scale = Vec3::new(2.0, 2.0, 2.0);
+
             commands.spawn((SpriteBundle {
-                transform: Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0)),
-                texture: asset_server.load("sprites/tower.png"),
+                transform: t,
+                texture: asset_server.load("sprites/tower2.png"),
                 visibility: Visibility::Visible,
                 ..default()
             },

@@ -1,4 +1,7 @@
+use std::collections::btree_map::Range;
+
 use bevy::prelude::*;
+use bevy::render::view::VisibleEntities;
 use bevy_egui::egui::Pos2;
 use bevy_egui::{egui, EguiContexts};
 
@@ -67,6 +70,10 @@ impl Tower {
 
     pub fn get_range(&self) -> f32 {
         return self.range;
+    }
+
+    pub fn set_selected(&mut self, selected: bool) {
+        self.selected = selected;
     }
 
     pub fn is_selected(&self) -> bool {
@@ -205,26 +212,28 @@ fn upgrade_tower(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window>,
+    mut range_view_query: Query<&mut Visibility, With<RangeView>>,
     mut contexts: EguiContexts,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
+    let mut range_view = range_view_query.get_single_mut().unwrap();
 
-    if (mouse.just_released(MouseButton::Left)) {
-        if (contexts.ctx_mut().is_pointer_over_area()) {
-            return;
-        }
-
+    if (mouse.just_released(MouseButton::Left) && !contexts.ctx_mut().is_pointer_over_area()) {
         if let Some(world_position) = window.cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor)) {
 
             for (mut tower, transform) in tower_query.iter_mut() {
-                if (tower.clicked(world_position, &transform)) {
+                tower.selected = false;
+            }
+
+            for (mut tower, transform) in tower_query.iter_mut() {
+                if (!tower.selected && tower.clicked(world_position, &transform)) {
                     tower.selected = true;
                     break;
                 }
 
-                tower.selected = false;
+                (*range_view) = Visibility::Hidden;
             }
         }
     }
@@ -235,7 +244,7 @@ fn upgrade_tower(
                 ui.label("Level: 1");
                 ui.label("Rate of Fire: ");
                 if (ui.button("Upgrade Tower (20 Coins)").clicked()) {
-
+                    println!("Tower upgraded!");
                 }
             });
             return;
