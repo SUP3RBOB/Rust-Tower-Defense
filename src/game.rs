@@ -221,6 +221,8 @@ fn game_ui(
             }
         }
 
+        ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
+
         if (ui.button("Place Tower").clicked() && player_info.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
@@ -254,5 +256,9 @@ fn end_round(
         && round_info.enemies_killed >= round_info.total_enemies
         && !round_info.round_completed()) {
         round_info.round_completed = true;
+    }
+
+    if (round_info.round_completed && round_info.auto_start_round) {
+        round_info.new_round();
     }
 }
