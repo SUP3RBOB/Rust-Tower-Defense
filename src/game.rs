@@ -1,4 +1,5 @@
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2d, Mesh2dHandle};
+use bevy::ui::widget;
 use bevy::{prelude::*, render::view::visibility};
 use bevy::window::PrimaryWindow;
 use bevy_egui::{egui, EguiContexts};
@@ -220,8 +221,12 @@ fn game_ui(
                 round_info.new_round();
             }
         }
-
+        
         ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
+
+        /*let image = asset_server.load("sprites/tower1.png");
+        let icon = contexts.add_image(image.clone_weak());
+        ui.add(egui::Button::image_and_text(icon, "Tower 50 Coins"));*/
 
         if (ui.button("Place Tower").clicked() && player_info.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
