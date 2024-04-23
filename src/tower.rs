@@ -12,6 +12,12 @@ use crate::level::EnemyPath;
 use crate::game::PlayerStats;
 
 #[derive(Component)]
+pub struct RegularTower;
+
+#[derive(Component)]
+pub struct RocketTower;
+
+#[derive(Component)]
 pub struct Tower {
     pub activated: bool,
     range: f32,

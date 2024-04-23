@@ -5,6 +5,7 @@ mod enemy;
 mod game;
 mod tower;
 mod bullet;
+mod explosion;
 
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
