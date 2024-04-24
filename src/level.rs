@@ -130,7 +130,7 @@ fn spawn_enemies(
 
         timer.add_time(time.delta_seconds());
 
-        if (timer.get_time() >= ENEMY_SPAWN_RATE) {
+        if (timer.get_time() >= round_info.spawn_rate()) {
             commands.spawn((
                 Enemy::new(150.0),
                 SpriteBundle {

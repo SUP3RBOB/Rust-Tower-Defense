@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_egui::egui::load::SizedTexture;
-use bevy_egui::egui::Button;
+use bevy_egui::egui::{Button, Pos2};
 use bevy_egui::{egui, EguiContext, EguiUserTextures};
 use crate::resources::Images;
 use crate::tower::Tower;
@@ -25,7 +25,7 @@ impl GameTimer {
     pub fn new(start_time: f32) -> GameTimer {
         return GameTimer {
             time: start_time,
-        }
+        };
     }
 
     pub fn get_time(&self) -> f32 {
@@ -55,7 +55,7 @@ impl Health {
         return Health {
             health: max_hp,
             max_health: max_hp
-        }
+        };
     }
 
     pub fn get_health(&self) -> i32 {
@@ -112,6 +112,7 @@ pub struct RoundInfo {
     pub enemies_killed: i32,
     pub total_enemies: i32,
     auto_start_round: bool,
+    spawn_rate: f32,
 }
 
 impl RoundInfo {
@@ -124,16 +125,21 @@ impl RoundInfo {
             enemies_killed: 0,
             total_enemies: 3,
             auto_start_round: false,
+            spawn_rate: 3.0
         };
     }
 
     pub fn new_round(&mut self) {
         self.round += 1;
         self.round_completed = false;
-        self.total_enemies += self.round * 2;
+        self.total_enemies += 3;
         self.max_enemies = self.total_enemies;
         self.enemies_spawned = 0;
         self.enemies_killed = 0;
+        
+        if (self.spawn_rate > 0.4) {
+            self.spawn_rate -= 0.25;
+        }
     }
 
     pub fn round_completed(&self) -> bool {
@@ -146,6 +152,14 @@ impl RoundInfo {
 
     pub fn set_round_auto_start(&mut self, start: bool) {
         self.auto_start_round = start;
+    }
+
+    pub fn spawn_rate(&self) -> f32 {
+        return self.spawn_rate;
+    }
+
+    pub fn set_spawn_rate(&mut self, spawn_rate: f32) {
+        self.spawn_rate = spawn_rate;
     }
 }
 
@@ -210,7 +224,7 @@ fn game_ui(
 ) {
     let mut player_info = player_stats_query.get_single_mut().unwrap();
     let mut round_info = round_info_query.get_single_mut().unwrap();
-    let (mut r_transform, mut r_visible) = range_view_query.get_single_mut().unwrap();
+    let (r_transform, mut r_visible) = range_view_query.get_single_mut().unwrap();
 
     if (player_info.is_placing) {
         return;
@@ -223,7 +237,7 @@ fn game_ui(
         return;
     };
 
-    egui::Window::new("Game").show(ctx.get_mut(), |ui| {
+    egui::Window::new("Game").default_pos(Pos2::new(4.0, 4.0)).show(ctx.get_mut(), |ui| {
         ui.label(format!("Round: {}", round_info.round));
         ui.label(format!("Coins: {}", player_info.coins));
 
@@ -258,7 +272,28 @@ fn game_ui(
             (*r_visible) = Visibility::Visible;
         }
 
-        ui.add(Button::image_and_text(tower2_icon, "Tower 1 | 50 Coins"));
+        if (ui.add(Button::image_and_text(tower2_icon, "Tower 2 | 100 Coins")).clicked()) {
+            for mut tower in tower_query.iter_mut() {
+                tower.set_selected(false);
+            }
+
+            player_info.is_placing = true;
+
+            let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
+            t.scale = Vec3::new(2.0, 2.0, 2.0);
+
+            commands.spawn((SpriteBundle {
+                transform: t,
+                texture: images.tower2.clone(),
+                visibility: Visibility::Visible,
+                ..default()
+            },
+                Tower::new(120.0, 1.3, 100),
+                GameTimer::new(0.0))
+            );
+
+            (*r_visible) = Visibility::Visible;
+        }
     });
 }
 

@@ -23,6 +23,7 @@ pub struct Tower {
     rate_of_fire: f32,
     cost: i32,
     selected: bool,
+    level: i32
 }
 
 impl Tower {
@@ -33,7 +34,8 @@ impl Tower {
             direction: Vec3::ZERO,
             rate_of_fire: rof,
             cost: price,
-            selected: false
+            selected: false,
+            level: 1,
         }
     }
 
@@ -143,6 +145,8 @@ fn place_tower(
                 }
             }
 
+            (*range_visibility) = Visibility::Visible;
+
             if (mouse.just_released(MouseButton::Left)) {
                 if (in_path) {
                     return;
@@ -232,11 +236,11 @@ fn upgrade_tower(
             }
 
             for (mut tower, transform) in tower_query.iter_mut() {
-                if (!tower.selected && tower.clicked(world_position, &transform)) {
+                if (tower.activated && !tower.selected && tower.clicked(world_position, &transform)) {
                     tower.selected = true;
                     break;
                 }
-
+                
                 (*range_view) = Visibility::Hidden;
             }
         }
@@ -246,7 +250,7 @@ fn upgrade_tower(
         if (tower.selected) {
             egui::Window::new("Tower").default_pos(Pos2::new(1280.0, 720.0)).show(contexts.ctx_mut(), |ui| {
                 ui.label("Level: 1");
-                ui.label("Rate of Fire: ");
+                ui.label(format!("Rate of Fire: {} seconds", tower.rate_of_fire));
                 if (ui.button("Upgrade Tower (20 Coins)").clicked()) {
                     println!("Tower upgraded!");
                 }

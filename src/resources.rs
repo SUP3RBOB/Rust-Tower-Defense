@@ -3,8 +3,8 @@ use bevy::prelude::*;
 #[derive(Resource)]
 pub struct Images {
     pub tower1: Handle<Image>,
-    pub tower2: Handle<Image>,   
-    pub bullet: Handle<Image>,   
+    pub tower2: Handle<Image>,
+    pub bullet: Handle<Image>,
     pub path: Handle<Image>,
     pub range_view: Handle<Image>,
     pub square: Handle<Image>,
