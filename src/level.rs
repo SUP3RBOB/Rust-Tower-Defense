@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
 use crate::game::{GameTimer, EnemySpawner, RoundInfo, Health};
 use crate::enemy::Enemy;
+use crate::resources::Images;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
 
@@ -34,7 +35,7 @@ impl EnemyPath {
 pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, create_points);
+        app.add_systems(PostStartup, create_points);
         app.add_systems(Update, spawn_enemies);
     }
 }
@@ -43,7 +44,7 @@ fn create_points(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>
+    images: Res<Images>
 ) {
     let mut ps: Vec<Vec3> = Vec::new();
     ps.push(Vec3::new(220.0, -84.0, 0.0));
@@ -86,7 +87,7 @@ fn create_points(
         commands.spawn((
             SpriteBundle {
                 transform: t,
-                texture: asset_server.load("sprites/path.png"),
+                texture: images.path.clone(),
                 visibility: Visibility::Visible,
                 ..Default::default()
             },
@@ -114,10 +115,10 @@ fn create_points(
 
 fn spawn_enemies(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut timer_query: Query<&mut GameTimer, With<EnemySpawner>>,
     mut round_info_query: Query<&mut RoundInfo>,
     time: Res<Time>,
+    images: Res<Images>,
 ) {
     if let Ok(mut timer) = timer_query.get_single_mut() {
         let mut round_info = round_info_query.get_single_mut().unwrap();
@@ -134,7 +135,7 @@ fn spawn_enemies(
                 Enemy::new(150.0),
                 SpriteBundle {
                     transform: Transform::from_xyz(220.0, -84.0, 0.0),
-                    texture: asset_server.load("sprites/square.png"),
+                    texture: images.square.clone(),
                     visibility: Visibility::Visible,
                     ..Default::default()
                 },

@@ -6,6 +6,7 @@ mod game;
 mod tower;
 mod bullet;
 mod explosion;
+mod resources;
 
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
@@ -14,6 +15,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(EguiPlugin)
+        .add_plugins(resources::ImagesPlugin)
         .add_plugins(tower::TowerPlugin)
         .add_plugins(enemy::EnemyPlugin)
         .add_plugins(bullet::BulletPlugin)

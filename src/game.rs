@@ -1,15 +1,15 @@
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2d, Mesh2dHandle};
-use bevy::ui::widget;
-use bevy::{prelude::*, render::view::visibility};
+use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_egui::egui::Context;
-use bevy_egui::{egui, EguiContexts};
-use crate::tower::{self, Tower};
+use bevy_egui::egui::load::SizedTexture;
+use bevy_egui::egui::Button;
+use bevy_egui::{egui, EguiContext, EguiUserTextures};
+use crate::resources::Images;
+use crate::tower::Tower;
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, game_init);
+        app.add_systems(PostStartup, game_init);
         app.add_systems(Update, place_tower_range_view);
         app.add_systems(Update, game_ui);
         app.add_systems(Update, end_round);
@@ -154,7 +154,7 @@ pub struct RangeView;
 
 fn game_init(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    images: Res<Images>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -171,7 +171,7 @@ fn game_init(
     commands.spawn((
         SpriteBundle {
             transform: Transform::from_xyz(64.0, 64.0, -0.5),
-            texture: asset_server.load("sprites/range_view.png"),
+            texture: images.range_view.clone(),
             visibility: Visibility::Hidden,
             ..default()
         },
@@ -191,19 +191,22 @@ fn place_tower_range_view(
             r_transform.translation.z = -0.5;
             r_transform.scale = Vec3::new(tower.get_range() * 2.0 / 32.0, tower.get_range() * 2.0 / 32.0, 1.0);
             (*visibility) = Visibility::Visible;
-            break;
+            return;
         }
     }
+
+    (*visibility) = Visibility::Hidden;
 }
 
 fn game_ui(
-    mut contexts: EguiContexts,
+    mut contexts: Query<&mut EguiContext, With<PrimaryWindow>>,
     mut commands: Commands,
     mut player_stats_query: Query<&mut PlayerStats>,
     mut round_info_query: Query<&mut RoundInfo>,
     mut range_view_query: Query<(&mut Transform, &mut Visibility), With<RangeView>>,
     mut tower_query: Query<&mut Tower>,
-    asset_server: Res<AssetServer>
+    mut egui_user_textures: ResMut<EguiUserTextures>,
+    images: Res<Images>,
 ) {
     let mut player_info = player_stats_query.get_single_mut().unwrap();
     let mut round_info = round_info_query.get_single_mut().unwrap();
@@ -213,9 +216,14 @@ fn game_ui(
         return;
     }
 
-    egui::Window::new("Game").show(contexts.ctx_mut(), |ui| {
-        //egui_extras::install_image_loaders(contexts);
+    let tower1_icon = SizedTexture::new(egui_user_textures.add_image(images.tower1.clone_weak()), [64.0, 64.0]);
+    let tower2_icon = SizedTexture::new(egui_user_textures.add_image(images.tower2.clone_weak()), [64.0, 64.0]);
 
+    let Ok(mut ctx) = contexts.get_single_mut() else {
+        return;
+    };
+
+    egui::Window::new("Game").show(ctx.get_mut(), |ui| {
         ui.label(format!("Round: {}", round_info.round));
         ui.label(format!("Coins: {}", player_info.coins));
 
@@ -227,10 +235,7 @@ fn game_ui(
         
         ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
 
-        let image = egui::include_image!("../assets/sprites/tower1.png");
-        ui.add(egui::Button::image_and_text(image, "Tower 50 Coins"));
-
-        if (ui.button("Place Tower").clicked() && player_info.get_coins() >= 50) {
+        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 | 50 Coins")).clicked() && player_info.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
@@ -242,7 +247,7 @@ fn game_ui(
 
             commands.spawn((SpriteBundle {
                 transform: t,
-                texture: asset_server.load("sprites/tower2.png"),
+                texture: images.tower1.clone(),
                 visibility: Visibility::Visible,
                 ..default()
             },
@@ -252,6 +257,8 @@ fn game_ui(
 
             (*r_visible) = Visibility::Visible;
         }
+
+        ui.add(Button::image_and_text(tower2_icon, "Tower 1 | 50 Coins"));
     });
 }
 

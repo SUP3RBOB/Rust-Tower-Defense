@@ -1,7 +1,4 @@
-use std::collections::btree_map::Range;
-
 use bevy::prelude::*;
-use bevy::render::view::VisibleEntities;
 use bevy_egui::egui::Pos2;
 use bevy_egui::{egui, EguiContexts};
 
@@ -10,6 +7,7 @@ use crate::bullet::Bullet;
 use crate::game::{GameTimer, RangeView};
 use crate::level::EnemyPath;
 use crate::game::PlayerStats;
+use crate::resources::Images;
 
 #[derive(Component)]
 pub struct RegularTower;
@@ -170,7 +168,7 @@ fn update_tower(
     mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer)>,
     enemy_query: Query<(&Transform, &Enemy), Without<Tower>>,
     time: Res<Time>,
-    asset_server: Res<AssetServer>
+    images: Res<Images>
 ) {
     let mut points: Vec<Vec3> = Vec::new();
     for (transform, enemy) in enemy_query.iter() {
@@ -202,7 +200,7 @@ fn update_tower(
                 Bullet::new(10, tower.direction, 550.0, 2.0),
                 SpriteBundle {
                     transform: bullet,
-                    texture: asset_server.load("sprites/bullet.png"),
+                    texture: images.bullet.clone(),
                     visibility: Visibility::Visible,
                     ..default()
                 },
