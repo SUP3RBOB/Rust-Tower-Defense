@@ -264,7 +264,6 @@ fn update_directional_tower(
         }
 
         tower.set_direction(Vec3::normalize(closest - transform.translation));
-        tower.rotate_towards(&mut transform, closest);
 
         timer.add_time(time.delta_seconds());
         if (timer.get_time() >= tower.rate_of_fire) {
