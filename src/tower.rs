@@ -13,6 +13,9 @@ use crate::resources::Images;
 pub struct RegularTower;
 
 #[derive(Component)]
+pub struct DirectionalTower;
+
+#[derive(Component)]
 pub struct RocketTower;
 
 #[derive(Component)]
@@ -169,7 +172,7 @@ fn place_tower(
 
 fn update_tower(
     mut commands: Commands,
-    mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer)>,
+    mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer), Without<DirectionalTower>>,
     enemy_query: Query<(&Transform, &Enemy), Without<Tower>>,
     time: Res<Time>,
     images: Res<Images>
@@ -211,6 +214,63 @@ fn update_tower(
                 GameTimer::new(0.0)
             ));
             timer.reset();
+        }
+    }
+}
+
+fn update_directional_tower(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut tower_query: Query<(&mut Tower, &mut Transform, &mut GameTimer), With<DirectionalTower>>,
+    enemy_query: Query<(&Transform, &Enemy), Without<Tower>>,
+    images: Res<Images>,
+) {
+    let mut points: Vec<Vec3> = Vec::new();
+    for (transform, enemy) in enemy_query.iter() {
+        points.push(transform.translation + (enemy.direction * 32.0));
+    }
+
+    for (mut tower, mut transform, mut timer) in tower_query.iter_mut() {
+        if (!tower.activated) {
+            continue;
+        }
+        
+        let mut closest = Vec3::ZERO;
+        let has_closest: bool = tower.closest_in_range(transform.translation, &points, &mut closest);
+        //println!("{}, {}, {}", closest.x, closest.y, closest.z);
+
+        if (!has_closest) {
+            continue;
+        }
+
+        tower.set_direction(Vec3::normalize(closest - transform.translation));
+        tower.rotate_towards(&mut transform, closest);
+
+        timer.add_time(time.delta_seconds());
+        if (timer.get_time() >= tower.rate_of_fire) {
+            let mut bullet = Transform::from_translation(transform.translation);
+
+            let mut i = 0f32;
+            let mut dir = Vec3::new(1.0, 0.0, 0.0);
+            while (i < 8.0) {
+                let angle_rad: f32 = (45.0 * i) * std::f32::consts::PI;
+                dir.x = dir.x * angle_rad.cos() - dir.y * angle_rad.sin();
+                dir.y = dir.x * angle_rad.sin() + dir.y * angle_rad.cos();
+
+                commands.spawn((
+                    Bullet::new(7, dir, 550.0, 1.75),
+                    SpriteBundle {
+                        transform: bullet,
+                        texture: images.bullet.clone(),
+                        visibility: Visibility::Visible,
+                        ..default()
+                    },
+                    GameTimer::new(0.0)
+                ));
+                timer.reset();
+
+                i += 1f32;
+            }
         }
     }
 }

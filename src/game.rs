@@ -4,7 +4,7 @@ use bevy_egui::egui::load::SizedTexture;
 use bevy_egui::egui::{Button, Pos2};
 use bevy_egui::{egui, EguiContext, EguiUserTextures};
 use crate::resources::Images;
-use crate::tower::Tower;
+use crate::tower::{DirectionalTower, Tower};
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
@@ -289,7 +289,8 @@ fn game_ui(
                 ..default()
             },
                 Tower::new(120.0, 1.3, 100),
-                GameTimer::new(0.0))
+                GameTimer::new(0.0),
+                DirectionalTower)
             );
 
             (*r_visible) = Visibility::Visible;
