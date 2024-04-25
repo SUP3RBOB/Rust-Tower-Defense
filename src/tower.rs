@@ -104,13 +104,33 @@ impl Tower {
 
         return false;
     }
+
+    pub fn upgrade(&mut self, range: f32, rate_of_fire: f32) {
+        self.range += range;
+        
+        if (self.rate_of_fire >= 0.1) {
+            self.rate_of_fire -= rate_of_fire;
+        }
+    }
 }
+
+const DIRECTIONS: [Vec3; 8] = [
+    Vec3::new(1.0, 0.0, 0.0),
+    Vec3::new(0.707106781186548f32, 0.707106781186548f32, 0.0),
+    Vec3::new(0.0, 1.0, 0.0),
+    Vec3::new(-0.707106781186548f32, 0.707106781186548f32, 0.0),
+    Vec3::new(-1.0, 0.0, 0.0),
+    Vec3::new(-0.707106781186548f32, -0.707106781186548f32, 0.0),
+    Vec3::new(0.0, -1.0, 0.0),
+    Vec3::new(0.707106781186548f32, -0.707106781186548f32, 0.0)
+];
 
 pub struct TowerPlugin;
 impl Plugin for TowerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, place_tower);
         app.add_systems(Update, update_tower);
+        app.add_systems(Update, update_directional_tower);
         app.add_systems(Update, upgrade_tower);
     }
 }
@@ -248,19 +268,16 @@ fn update_directional_tower(
 
         timer.add_time(time.delta_seconds());
         if (timer.get_time() >= tower.rate_of_fire) {
-            let mut bullet = Transform::from_translation(transform.translation);
+            let mut bullet_t = Transform::from_translation(transform.translation);
 
-            let mut i = 0f32;
-            let mut dir = Vec3::new(1.0, 0.0, 0.0);
-            while (i < 8.0) {
-                let angle_rad: f32 = (45.0 * i) * std::f32::consts::PI;
-                dir.x = dir.x * angle_rad.cos() - dir.y * angle_rad.sin();
-                dir.y = dir.x * angle_rad.sin() + dir.y * angle_rad.cos();
+            for dir in DIRECTIONS {
+                let angle = f32::atan2(dir.y, dir.x);
+                bullet_t.rotation = Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, angle);
 
                 commands.spawn((
                     Bullet::new(7, dir, 550.0, 1.75),
                     SpriteBundle {
-                        transform: bullet,
+                        transform: bullet_t,
                         texture: images.bullet.clone(),
                         visibility: Visibility::Visible,
                         ..default()
@@ -268,8 +285,6 @@ fn update_directional_tower(
                     GameTimer::new(0.0)
                 ));
                 timer.reset();
-
-                i += 1f32;
             }
         }
     }

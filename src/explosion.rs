@@ -6,13 +6,15 @@ use crate::game::GameTimer;
 pub struct Explosion {
     radius: f32,
     lifetime: f32,
+    damaged: bool
 }
 
 impl Explosion {
     pub fn new(radius: f32, lifetime: f32) -> Explosion {
         return Explosion {
             radius,
-            lifetime
+            lifetime,
+            damaged: false
         };
     }
 }

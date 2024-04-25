@@ -232,6 +232,7 @@ fn game_ui(
 
     let tower1_icon = SizedTexture::new(egui_user_textures.add_image(images.tower1.clone_weak()), [64.0, 64.0]);
     let tower2_icon = SizedTexture::new(egui_user_textures.add_image(images.tower2.clone_weak()), [64.0, 64.0]);
+    let tower3_icon = SizedTexture::new(egui_user_textures.add_image(images.tower3.clone_weak()), [64.0, 64.0]);
 
     let Ok(mut ctx) = contexts.get_single_mut() else {
         return;
@@ -249,7 +250,7 @@ fn game_ui(
         
         ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
 
-        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 | 50 Coins")).clicked() && player_info.get_coins() >= 50) {
+        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 |  50 Coins")).clicked() && player_info.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
@@ -288,7 +289,31 @@ fn game_ui(
                 visibility: Visibility::Visible,
                 ..default()
             },
-                Tower::new(120.0, 1.3, 100),
+                Tower::new(120.0, 1.2, 100),
+                GameTimer::new(0.0),
+                )
+            );
+
+            (*r_visible) = Visibility::Visible;
+        }
+
+        if (ui.add(Button::image_and_text(tower3_icon, "Tower 3 |  75 Coins")).clicked()) {
+            for mut tower in tower_query.iter_mut() {
+                tower.set_selected(false);
+            }
+
+            player_info.is_placing = true;
+
+            let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
+            t.scale = Vec3::new(2.0, 2.0, 2.0);
+
+            commands.spawn((SpriteBundle {
+                transform: t,
+                texture: images.tower3.clone(),
+                visibility: Visibility::Visible,
+                ..default()
+            },
+                Tower::new(110.0, 1.2, 75),
                 GameTimer::new(0.0),
                 DirectionalTower)
             );
