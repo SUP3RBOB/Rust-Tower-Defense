@@ -6,6 +6,8 @@ use bevy_egui::{egui, EguiContext, EguiUserTextures};
 use crate::resources::Images;
 use crate::tower::{DirectionalTower, Tower};
 
+const TOWER_BUTTON_SIZE: [f32; 2] = [158.0, 40.0];
+
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
@@ -250,7 +252,7 @@ fn game_ui(
         
         ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
 
-        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 | 50 Coins")).clicked() && player_stats.get_coins() >= 50) {
+        if (ui.add_sized(TOWER_BUTTON_SIZE, Button::image_and_text(tower1_icon, "Tower 1 | 50 Coins")).clicked() && player_stats.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
@@ -273,7 +275,7 @@ fn game_ui(
             (*r_visible) = Visibility::Visible;
         }
 
-        if (ui.add(Button::image_and_text(tower2_icon, "Tower 2 | 100 Coins")).clicked() && player_stats.get_coins() >= 100) {
+        if (ui.add_sized(TOWER_BUTTON_SIZE, Button::image_and_text(tower2_icon, "Tower 2 | 100 Coins")).clicked() && player_stats.get_coins() >= 100) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
@@ -297,7 +299,7 @@ fn game_ui(
             (*r_visible) = Visibility::Visible;
         }
 
-        if (ui.add(Button::image_and_text(tower3_icon, "Tower 3 | 75 Coins")).clicked() && player_stats.get_coins() >= 75) {
+        if (ui.add_sized(TOWER_BUTTON_SIZE, Button::image_and_text(tower3_icon, "Tower 3 | 75 Coins")).clicked() && player_stats.get_coins() >= 75) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
