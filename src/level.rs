@@ -1,10 +1,17 @@
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
+use rand::Rng;
 use crate::game::{GameTimer, EnemySpawner, RoundInfo, Health};
-use crate::enemy::Enemy;
+use crate::enemy::{self, Enemy, EnemyBundle};
 use crate::resources::Images;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
+type EnemyType = fn(Handle<Image>) -> EnemyBundle;
+const ENEMY_TYPES: [EnemyType; 3] = [
+    enemy::weak_enemy,
+    enemy::fast_enemy,
+    enemy::medium_enemy,
+];
 
 #[derive(Component)]
 pub struct Waypoints {
@@ -116,13 +123,11 @@ fn create_points(
 fn spawn_enemies(
     mut commands: Commands,
     mut timer_query: Query<&mut GameTimer, With<EnemySpawner>>,
-    mut round_info_query: Query<&mut RoundInfo>,
+    mut round_info: ResMut<RoundInfo>,
     time: Res<Time>,
     images: Res<Images>,
 ) {
     if let Ok(mut timer) = timer_query.get_single_mut() {
-        let mut round_info = round_info_query.get_single_mut().unwrap();
-
         if (round_info.enemies_spawned >= round_info.total_enemies || round_info.round_completed()) {
             timer.reset();
             return;
@@ -131,16 +136,14 @@ fn spawn_enemies(
         timer.add_time(time.delta_seconds());
 
         if (timer.get_time() >= round_info.spawn_rate()) {
-            commands.spawn((
-                Enemy::new(150.0),
-                SpriteBundle {
-                    transform: Transform::from_xyz(220.0, -84.0, 0.0),
-                    texture: images.square.clone(),
-                    visibility: Visibility::Visible,
-                    ..Default::default()
-                },
-                Health::new(30),
-            ));
+            let enemy_images: [Handle<Image>; 3] = [
+                images.square.clone_weak(),
+                images.square.clone_weak(),
+                images.square.clone_weak()
+            ];
+
+            let num: usize = rand::thread_rng().gen_range(0usize..3usize);
+            commands.spawn(ENEMY_TYPES[num](enemy_images[num].clone_weak()));
             
             round_info.enemies_spawned += 1;
             timer.reset();

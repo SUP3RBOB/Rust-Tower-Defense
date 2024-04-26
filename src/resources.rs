@@ -8,7 +8,7 @@ pub struct Images {
     pub bullet: Handle<Image>,
     pub path: Handle<Image>,
     pub range_view: Handle<Image>,
-    pub square: Handle<Image>,
+    pub square: Handle<Image>
 }
 
 pub struct ImagesPlugin;
@@ -26,6 +26,6 @@ fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
         bullet: assets.load("sprites/bullet.png"),
         path: assets.load("sprites/path.png"),
         range_view: assets.load("sprites/range_view.png"),
-        square: assets.load("sprites/square.png"),
+        square: assets.load("sprites/square.png")
     });
 }

@@ -4,6 +4,9 @@ use crate::bullet::Bullet;
 use crate::game::{Health, PlayerStats, RoundInfo};
 use crate::level::Waypoints;
 
+const ENEMY_SIZE: Vec2 = Vec2::new(32.0, 32.0);
+const BULLET_SIZE: Vec2 = Vec2::new(24.0, 4.0);
+
 #[derive(Component)]
 pub struct Enemy {
     pub speed: f32,
@@ -27,6 +30,13 @@ impl Plugin for EnemyPlugin {
         app.add_systems(Update, move_enemy);
         app.add_systems(Update, bullet_collision);
     }
+}
+
+#[derive(Bundle)]
+pub struct EnemyBundle {
+    enemy: Enemy,
+    sprite_bundle: SpriteBundle,
+    health: Health,
 }
 
 fn move_enemy(
@@ -58,18 +68,12 @@ fn bullet_collision(
     mut commands: Commands,
     mut enemy_query: Query<(Entity, &Transform, &mut Health), With<Enemy>>,
     bullet_query: Query<(Entity, &Transform, &Bullet)>,
-    mut player_stats_query: Query<&mut PlayerStats>,
-    mut round_info_query: Query<&mut RoundInfo>,
+    mut player_stats: ResMut<PlayerStats>,
+    mut round_info: ResMut<RoundInfo>,
 ) {
-    let mut player_stats = player_stats_query.get_single_mut().unwrap();
-    let mut round_info = round_info_query.get_single_mut().unwrap();
-
-    let e_size = Vec2::new(32.0, 32.0);
-    let b_size = Vec2::new(24.0, 4.0);
-
     for (e_entity, enemy, mut health) in enemy_query.iter_mut() {
         for (b_entity, b_transform, bullet) in bullet_query.iter() {
-            let collision = collide(enemy.translation, e_size, b_transform.translation, b_size);
+            let collision = collide(enemy.translation, ENEMY_SIZE, b_transform.translation, BULLET_SIZE);
             
             if let Some(collision) = collision {
                 commands.entity(b_entity).despawn();
@@ -85,5 +89,44 @@ fn bullet_collision(
                 player_stats.add_coins(1);
             }
         }
+    }
+}
+
+pub fn weak_enemy(image: Handle<Image>) -> EnemyBundle {
+    return EnemyBundle {
+        enemy: Enemy::new(150.0),
+        sprite_bundle: SpriteBundle {
+            transform: Transform::from_xyz(220.0, -84.0, 0.0),
+            texture: image,
+            visibility: Visibility::Visible,
+            ..Default::default()
+        },
+        health: Health::new(30),
+    }
+}
+
+pub fn fast_enemy(image: Handle<Image>) -> EnemyBundle {
+    return EnemyBundle {
+        enemy: Enemy::new(320.0),
+        sprite_bundle: SpriteBundle {
+            transform: Transform::from_xyz(220.0, -84.0, 0.0),
+            texture: image,
+            visibility: Visibility::Visible,
+            ..Default::default()
+        },
+        health: Health::new(20),
+    }
+}
+
+pub fn medium_enemy(image: Handle<Image>) -> EnemyBundle {
+    return EnemyBundle {
+        enemy: Enemy::new(200.0),
+        sprite_bundle: SpriteBundle {
+            transform: Transform::from_xyz(220.0, -84.0, 0.0),
+            texture: image,
+            visibility: Visibility::Visible,
+            ..Default::default()
+        },
+        health: Health::new(60),
     }
 }

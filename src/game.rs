@@ -71,7 +71,7 @@ impl Health {
     }
 }
 
-#[derive(Component)]
+#[derive(Resource)]
 pub struct PlayerStats {
     coins: i32,
     pub is_placing: bool
@@ -103,7 +103,7 @@ impl PlayerStats {
 
 }
 
-#[derive(Component)]
+#[derive(Resource)]
 pub struct RoundInfo {
     round: i32,
     round_completed: bool,
@@ -180,8 +180,10 @@ fn game_init(
     });
 
     commands.spawn((GameTimer::new(0.0), EnemySpawner));
-    commands.spawn(PlayerStats::new(100));
-    commands.spawn(RoundInfo::new());
+
+    commands.insert_resource(PlayerStats::new(100));
+    commands.insert_resource(RoundInfo::new());
+
     commands.spawn((
         SpriteBundle {
             transform: Transform::from_xyz(64.0, 64.0, -0.5),
@@ -215,18 +217,16 @@ fn place_tower_range_view(
 fn game_ui(
     mut contexts: Query<&mut EguiContext, With<PrimaryWindow>>,
     mut commands: Commands,
-    mut player_stats_query: Query<&mut PlayerStats>,
-    mut round_info_query: Query<&mut RoundInfo>,
+    mut player_stats: ResMut<PlayerStats>,
+    mut round_info: ResMut<RoundInfo>,
     mut range_view_query: Query<(&mut Transform, &mut Visibility), With<RangeView>>,
     mut tower_query: Query<&mut Tower>,
     mut egui_user_textures: ResMut<EguiUserTextures>,
     images: Res<Images>,
 ) {
-    let mut player_info = player_stats_query.get_single_mut().unwrap();
-    let mut round_info = round_info_query.get_single_mut().unwrap();
     let (r_transform, mut r_visible) = range_view_query.get_single_mut().unwrap();
 
-    if (player_info.is_placing) {
+    if (player_stats.is_placing) {
         return;
     }
 
@@ -240,7 +240,7 @@ fn game_ui(
 
     egui::Window::new("Game").default_pos(Pos2::new(4.0, 4.0)).show(ctx.get_mut(), |ui| {
         ui.label(format!("Round: {}", round_info.round));
-        ui.label(format!("Coins: {}", player_info.coins));
+        ui.label(format!("Coins: {}", player_stats.coins));
 
         if (round_info.round_completed()) {
             if (ui.button("New Round").clicked()) {
@@ -250,12 +250,12 @@ fn game_ui(
         
         ui.checkbox(&mut round_info.auto_start_round, "Auto Start New Round");
 
-        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 |  50 Coins")).clicked() && player_info.get_coins() >= 50) {
+        if (ui.add(Button::image_and_text(tower1_icon, "Tower 1 | 50 Coins")).clicked() && player_stats.get_coins() >= 50) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
 
-            player_info.is_placing = true;
+            player_stats.is_placing = true;
 
             let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
             t.scale = Vec3::new(2.0, 2.0, 2.0);
@@ -273,12 +273,12 @@ fn game_ui(
             (*r_visible) = Visibility::Visible;
         }
 
-        if (ui.add(Button::image_and_text(tower2_icon, "Tower 2 | 100 Coins")).clicked()) {
+        if (ui.add(Button::image_and_text(tower2_icon, "Tower 2 | 100 Coins")).clicked() && player_stats.get_coins() >= 100) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
 
-            player_info.is_placing = true;
+            player_stats.is_placing = true;
 
             let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
             t.scale = Vec3::new(2.0, 2.0, 2.0);
@@ -297,12 +297,12 @@ fn game_ui(
             (*r_visible) = Visibility::Visible;
         }
 
-        if (ui.add(Button::image_and_text(tower3_icon, "Tower 3 |  75 Coins")).clicked()) {
+        if (ui.add(Button::image_and_text(tower3_icon, "Tower 3 | 75 Coins")).clicked() && player_stats.get_coins() >= 75) {
             for mut tower in tower_query.iter_mut() {
                 tower.set_selected(false);
             }
 
-            player_info.is_placing = true;
+            player_stats.is_placing = true;
 
             let mut t = Transform::from_translation(Vec3::new(-16.0, -16.0, 3.0));
             t.scale = Vec3::new(2.0, 2.0, 2.0);
@@ -324,9 +324,8 @@ fn game_ui(
 }
 
 fn end_round(
-    mut round_info_query: Query<&mut RoundInfo>
+    mut round_info: ResMut<RoundInfo>
 ) {
-    let mut round_info = round_info_query.get_single_mut().unwrap();
     if (round_info.enemies_spawned == round_info.enemies_killed 
         && round_info.enemies_killed >= round_info.total_enemies
         && !round_info.round_completed()) {

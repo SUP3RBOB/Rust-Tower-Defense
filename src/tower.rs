@@ -142,12 +142,11 @@ fn place_tower(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse: Res<Input<MouseButton>>,
     mut tower_query: Query<(Entity, &mut Tower, &mut Transform)>,
-    mut player_stats_query: Query<&mut PlayerStats>,
+    mut player_stats: ResMut<PlayerStats>,
     mut range_view_query: Query<&mut Visibility, With<RangeView>>,
 ) {
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
-    let mut player_stats = player_stats_query.get_single_mut().unwrap();
     let mut range_visibility = range_view_query.get_single_mut().unwrap();
 
     for (entity, mut tower, mut transform) in tower_query.iter_mut() {
