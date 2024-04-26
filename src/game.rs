@@ -230,9 +230,9 @@ fn game_ui(
         return;
     }
 
-    let tower1_icon = SizedTexture::new(egui_user_textures.add_image(images.tower1.clone_weak()), [64.0, 64.0]);
-    let tower2_icon = SizedTexture::new(egui_user_textures.add_image(images.tower2.clone_weak()), [64.0, 64.0]);
-    let tower3_icon = SizedTexture::new(egui_user_textures.add_image(images.tower3.clone_weak()), [64.0, 64.0]);
+    let tower1_icon = SizedTexture::new(egui_user_textures.add_image(images.tower1.clone_weak()), [32.0, 32.0]);
+    let tower2_icon = SizedTexture::new(egui_user_textures.add_image(images.tower2.clone_weak()), [32.0, 32.0]);
+    let tower3_icon = SizedTexture::new(egui_user_textures.add_image(images.tower3.clone_weak()), [32.0, 32.0]);
 
     let Ok(mut ctx) = contexts.get_single_mut() else {
         return;
