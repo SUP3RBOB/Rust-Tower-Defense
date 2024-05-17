@@ -6,11 +6,12 @@ use crate::enemy::{self, Enemy, EnemyBundle};
 use crate::resources::Images;
 
 const ENEMY_SPAWN_RATE: f32 = 3.0;
-type EnemyType = fn(Handle<Image>) -> EnemyBundle;
-const ENEMY_TYPES: [EnemyType; 3] = [
+pub type EnemyType = fn(Handle<Image>) -> EnemyBundle;
+pub const ENEMY_TYPES: [EnemyType; 4] = [
     enemy::weak_enemy,
     enemy::fast_enemy,
     enemy::medium_enemy,
+    enemy::strong_enemy,
 ];
 
 #[derive(Component)]
@@ -82,7 +83,7 @@ fn create_points(
     paths.push(Vec3::new(2.4, 18.05, -1.0));
     paths.push(Vec3::new(16.5, 2.4, -1.0));
 
-    let mut i = 0;
+    let mut i: usize = 0;
     while (i < ps.len() - 1) {
         let mut t = Transform {
             translation: (ps[i] + ps[i + 1usize]) / 2.0,
@@ -136,13 +137,15 @@ fn spawn_enemies(
         timer.add_time(time.delta_seconds());
 
         if (timer.get_time() >= round_info.spawn_rate()) {
-            let enemy_images: [Handle<Image>; 3] = [
+            let enemy_images: [Handle<Image>; 4] = [
+                images.square.clone_weak(),
                 images.square.clone_weak(),
                 images.square.clone_weak(),
                 images.square.clone_weak()
             ];
-
-            let num: usize = rand::thread_rng().gen_range(0usize..3usize);
+            
+            let type_count = round_info.enemy_types_count();
+            let num: usize = rand::thread_rng().gen_range(0usize..type_count);
             commands.spawn(ENEMY_TYPES[num](enemy_images[num].clone_weak()));
             
             round_info.enemies_spawned += 1;

@@ -5,6 +5,7 @@ use bevy_egui::egui::{Button, Pos2};
 use bevy_egui::{egui, EguiContext, EguiUserTextures};
 use crate::resources::Images;
 use crate::tower::{DirectionalTower, Tower};
+use crate::level::{EnemyType, ENEMY_TYPES};
 
 const TOWER_BUTTON_SIZE: [f32; 2] = [158.0, 40.0];
 
@@ -45,6 +46,10 @@ impl GameTimer {
 
 #[derive(Component)]
 pub struct EnemySpawner;
+
+#[derive(Component)]
+pub struct PlayerBase;
+
 
 #[derive(Component)]
 pub struct Health {
@@ -115,6 +120,7 @@ pub struct RoundInfo {
     pub total_enemies: i32,
     auto_start_round: bool,
     spawn_rate: f32,
+    enemy_types: Vec<EnemyType>,
 }
 
 impl RoundInfo {
@@ -127,7 +133,8 @@ impl RoundInfo {
             enemies_killed: 0,
             total_enemies: 3,
             auto_start_round: false,
-            spawn_rate: 3.0
+            spawn_rate: 3.0,
+            enemy_types: vec![ENEMY_TYPES[0]],
         };
     }
 
@@ -141,6 +148,12 @@ impl RoundInfo {
         
         if (self.spawn_rate > 0.4) {
             self.spawn_rate -= 0.25;
+        }
+
+        if (self.round % 4 == 0) {
+            let new_enemy_index = (self.round / 4) as usize;
+            self.enemy_types.push(ENEMY_TYPES[new_enemy_index]);
+            println!("new enemy");
         }
     }
 
@@ -162,6 +175,10 @@ impl RoundInfo {
 
     pub fn set_spawn_rate(&mut self, spawn_rate: f32) {
         self.spawn_rate = spawn_rate;
+    }
+
+    pub fn enemy_types_count(&self) -> usize {
+        return self.enemy_types.len();
     }
 }
 
@@ -195,6 +212,8 @@ fn game_init(
         },
         RangeView
     ));
+
+    commands.spawn((Health::new(50), PlayerBase));
 }
 
 fn place_tower_range_view(
@@ -225,8 +244,10 @@ fn game_ui(
     mut tower_query: Query<&mut Tower>,
     mut egui_user_textures: ResMut<EguiUserTextures>,
     images: Res<Images>,
+    base_query: Query<&Health, With<PlayerBase>>,
 ) {
     let (r_transform, mut r_visible) = range_view_query.get_single_mut().unwrap();
+    let base_health = base_query.get_single().unwrap();
 
     if (player_stats.is_placing) {
         return;
@@ -241,6 +262,7 @@ fn game_ui(
     };
 
     egui::Window::new("Game").default_pos(Pos2::new(4.0, 4.0)).show(ctx.get_mut(), |ui| {
+        ui.label(format!("Health: {}", base_health.get_health()));
         ui.label(format!("Round: {}", round_info.round));
         ui.label(format!("Coins: {}", player_stats.coins));
 
