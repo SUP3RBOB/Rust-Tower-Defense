@@ -43,7 +43,7 @@ impl EnemyPath {
 pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, create_points);
+        app.add_systems(Startup, create_points);
         app.add_systems(Update, spawn_enemies);
     }
 }
@@ -138,7 +138,7 @@ fn spawn_enemies(
 
         if (timer.get_time() >= round_info.spawn_rate()) {
             let enemy_images: [Handle<Image>; 4] = [
-                images.square.clone_weak(),
+                images.enemy_regular(),
                 images.square.clone_weak(),
                 images.square.clone_weak(),
                 images.square.clone_weak()

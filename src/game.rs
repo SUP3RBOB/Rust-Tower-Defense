@@ -12,7 +12,7 @@ const TOWER_BUTTON_SIZE: [f32; 2] = [158.0, 40.0];
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostStartup, game_init);
+        app.add_systems(Startup, game_init);
         app.add_systems(Update, place_tower_range_view);
         app.add_systems(Update, game_ui);
         app.add_systems(Update, end_round);

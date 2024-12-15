@@ -8,13 +8,20 @@ pub struct Images {
     pub bullet: Handle<Image>,
     pub path: Handle<Image>,
     pub range_view: Handle<Image>,
-    pub square: Handle<Image>
+    pub square: Handle<Image>,
+    enemy_regular: Handle<Image>
+}
+
+impl Images {
+    pub fn enemy_regular(&self) -> Handle<Image> {
+        return self.enemy_regular.clone_weak();
+    }
 }
 
 pub struct ImagesPlugin;
 impl Plugin for ImagesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, load_assets);
+        app.add_systems(PreStartup, load_assets);
     }
 }
 
@@ -26,6 +33,7 @@ fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
         bullet: assets.load("sprites/bullet.png"),
         path: assets.load("sprites/path.png"),
         range_view: assets.load("sprites/range_view.png"),
-        square: assets.load("sprites/square.png")
+        square: assets.load("sprites/square.png"),
+        enemy_regular: assets.load("sprites/enemy_regular.png")
     });
 }

@@ -249,7 +249,7 @@ fn update_directional_tower(
         points.push(transform.translation + (enemy.direction * 32.0));
     }
 
-    for (mut tower, mut transform, mut timer) in tower_query.iter_mut() {
+    for (mut tower, transform, mut timer) in tower_query.iter_mut() {
         if (!tower.activated) {
             continue;
         }

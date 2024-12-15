@@ -25,6 +25,12 @@ impl Enemy {
             damage: dmg
         }
     }
+
+    fn rotate_towards(&self, transform: &mut Transform, point: Vec3) {
+        let difference = point - transform.translation;
+        let angle = f32::atan2(difference.y, difference.x);
+        transform.rotation = Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, angle);
+    }
 }
 
 pub struct EnemyPlugin;
@@ -51,8 +57,10 @@ fn move_enemy(
     mut base_query: Query<&mut Health, With<PlayerBase>>,
 ) {
     for (mut enemy, mut transform, entity) in query.iter_mut() {
+        let next_point = waypoints.single().points[enemy.waypoint_id];
+
         let dir = Vec3::normalize(waypoints.single().points[enemy.waypoint_id] - transform.translation);
-        let dist = Vec3::distance(transform.translation, waypoints.single().points[enemy.waypoint_id]);
+        let dist = Vec3::distance(transform.translation, next_point);
 
         if (dist <= 6.0) {
             if (enemy.waypoint_id < waypoints.single().points.len() - 1usize) {
@@ -67,6 +75,7 @@ fn move_enemy(
         } else {
             transform.translation += dir * enemy.speed * time.delta_seconds();
             enemy.direction = dir;
+            enemy.rotate_towards(&mut transform, next_point);
         }
 
         //println!("Enemy position: {}, {}, {} at waypoint {}", enemy.1.translation.x, enemy.1.translation.y, enemy.1.translation.z, enemy.0.waypoint_id);
@@ -102,10 +111,13 @@ fn bullet_collision(
 }
 
 pub fn weak_enemy(image: Handle<Image>) -> EnemyBundle {
+    let mut t = Transform::from_translation(ENEMY_SPAWN);
+    t.scale = Vec3::new(1.5, 1.5, 1.5);
+
     return EnemyBundle {
         enemy: Enemy::new(150.0, 1),
         sprite_bundle: SpriteBundle {
-            transform: Transform::from_xyz(220.0, -84.0, 0.0),
+            transform: t,
             texture: image,
             visibility: Visibility::Visible,
             ..Default::default()
